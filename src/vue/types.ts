@@ -8,13 +8,13 @@ export interface AnimationOptions {
   /**
    * Ratio of the duration to delay the move animation
    *
-   * @default 0.1
+   * @default 0.3
    */
   delayMove?: number
   /**
    * Ratio of the duration to delay the leave animation
    *
-   * @default 0.1
+   * @default 0
    */
   delayLeave?: number
   /**

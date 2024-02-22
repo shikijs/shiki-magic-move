@@ -40,12 +40,13 @@ const example = ref(vueBefore)
 const code = ref(example)
 const input = ref(code.value)
 const autoCommit = ref(true)
+const duration = ref(500)
 
 function reset() {
   if (lang.value === 'vue')
     example.value = example.value === vueBefore ? vueAfter : vueBefore
-  code.value = example.value
   input.value = example.value
+  code.value = example.value
 }
 
 function commit() {
@@ -92,7 +93,7 @@ watch(
 
 <template>
   <div class="h-screen flex flex-col font-sans max-h-screen">
-    <div class="flex flex-col items-center flex-none px4 pt6">
+    <div class="flex flex-col items-center flex-none px4 pt6 text-center">
       <span class="text-2xl font-200 bg-gradient-to-r from-teal to-orange inline-block text-transparent bg-clip-text">
         <span>Shiki</span>
         <span class="font-800 mx1">Magic</span>
@@ -105,7 +106,7 @@ watch(
         Working in progress. Repo is currently private, get early access by <a href="https://github.com/sponsors/antfu" target="_blank" class="underline hover:text-rose">sponsoring Anthony Fu</a>
       </div>
     </div>
-    <div class="grid grid-cols-2 p6 gap-4 flex-auto of-hidden">
+    <div class="grid md:grid-cols-2 p1 py6 md:p6 gap-4 flex-auto of-hidden">
       <div class="flex flex-col gap-2">
         <textarea
           v-model="input"
@@ -113,7 +114,7 @@ watch(
           @keydown.meta.enter.prevent="commit"
         />
         <div class="flex-none flex flex-wrap gap-4 items-center">
-          <button class="border border-gray:20 rounded px2 py1" @click="reset">
+          <button class="border border-gray:20 rounded px3 py1" @click="reset">
             Reset Example
           </button>
           <label>
@@ -121,11 +122,20 @@ watch(
               v-model="autoCommit"
               type="checkbox"
             >
-            Auto Commit <sup v-if="!autoCommit" class="op50">(Cmd+Enter to commit)</sup>
+            Auto Commit
           </label>
-          <button v-if="!autoCommit" class="border border-gray:20 rounded px2 py1" @click="commit">
-            Commit
+          <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
+            Commit Changes
           </button>
+          <label class="flex gap-2">
+            Duration
+            <input
+              v-model="duration"
+              type="range" min="100" max="5000"
+              class="border border-gray:20 rounded px2 py1"
+            >
+            {{ duration }}ms
+          </label>
 
           <div class="flex-auto" />
           <select
@@ -161,6 +171,7 @@ watch(
           :code="code"
           :lang="lang"
           :theme="theme"
+          :animation="{ duration }"
           class="font-mono w-full h-full p-4 border border-gray:20 shadow-xl rounded max-h-full of-scroll"
         />
         <div

@@ -14,8 +14,8 @@ const props = defineProps<{
 
 const {
   duration = 500,
-  delayMove = 0.1,
-  delayLeave = 0.1,
+  delayMove = 0.3,
+  delayLeave = 0,
   delayEnter = 0.8,
   easing = 'ease',
 } = props.animation || {}
@@ -41,8 +41,17 @@ const refTransitionGroup = ref<any>()
 const refContainer = computed(() => refTransitionGroup.value?.$el as HTMLPreElement | undefined)
 
 function savePosition(el: Element) {
+  RectMap.set(el as HTMLElement, getPosition(el))
+}
+
+function getPosition(el: Element) {
+  const { left: dLeft, top: dTop } = refContainer.value!.getBoundingClientRect()
+  const style = getComputedStyle(refContainer.value!)
   const { left, top } = el.getBoundingClientRect()
-  RectMap.set(el as HTMLElement, { left, top })
+  return {
+    left: left - dLeft - Number.parseInt(style.borderLeftWidth),
+    top: top - dTop - Number.parseInt(style.borderTopWidth),
+  }
 }
 
 function savePositions() {
@@ -52,7 +61,7 @@ function savePositions() {
 }
 
 function beforeLeave(el: Element | HTMLElement) {
-  const { left, top } = RectMap.get(el) || el.getBoundingClientRect()
+  const { left, top } = RectMap.get(el) || getPosition(el)
   if ('style' in el) {
     el.style.position = 'absolute'
     el.style.top = `${top}px`
@@ -94,8 +103,9 @@ onMounted(() => {
 
 <style scoped>
 .shiki-magic-move-container {
-  display: relative;
-  transition: all var(--duration) v-bind(easing);
+  position: relative;
+  white-space: pre;
+  overflow: scroll;
 }
 
 .shiki-magic-move-move, /* apply transition to moving elements */
@@ -107,10 +117,12 @@ onMounted(() => {
 
 .shiki-magic-move-move {
   transition-delay: calc(var(--duration) * v-bind(delayMove));
+  z-index: 1;
 }
 
 .shiki-magic-move-enter-active {
   transition-delay: calc(var(--duration) * v-bind(delayEnter));
+  z-index: 1;
 }
 
 .shiki-magic-move-leave-active {
@@ -119,7 +131,6 @@ onMounted(() => {
 
 .shiki-magic-move-item {
   display: inline-block;
-  transition: all var(--duration) v-bind(easing);
 }
 
 .shiki-magic-move-enter-from,
