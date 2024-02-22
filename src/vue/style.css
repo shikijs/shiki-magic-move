@@ -4,6 +4,11 @@
   overflow: scroll;
 }
 
+.shiki-magic-move-item {
+  display: inline-block;
+  transition: color var(--smm-duration) var(--smm-easing), background-color var(--smm-duration) var(--smm-easing);
+}
+
 .shiki-magic-move-move,
 .shiki-magic-move-enter-active,
 .shiki-magic-move-leave-active {
@@ -24,10 +29,6 @@
   transition-delay: calc(var(--duration) * var(--smm-delay-leave));
 }
 
-.shiki-magic-move-item {
-  display: inline-block;
-  transition: color var(--smm-duration) var(--smm-easing), background-color var(--smm-duration) var(--smm-easing);
-}
 
 .shiki-magic-move-enter-from,
 .shiki-magic-move-leave-to {
