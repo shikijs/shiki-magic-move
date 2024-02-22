@@ -1,5 +1,5 @@
 import { diff_match_patch as DMP } from 'diff-match-patch'
-import type { CodeToTokensOptions, HighlighterCore, ThemedToken, TokensResult } from 'shiki/core'
+import type { ThemedToken } from 'shiki/core'
 
 export type Range = [number, number]
 

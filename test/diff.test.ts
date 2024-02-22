@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { expect, it } from 'vitest'
 import { getHighlighter } from 'shiki/bundle/web'
-import { diffTokens, matchText } from '../src'
+import { diffTokens } from '../src/core'
 
 it('exported', async () => {
   const before = `

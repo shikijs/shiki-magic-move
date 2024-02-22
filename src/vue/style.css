@@ -1,0 +1,38 @@
+.shiki-magic-move-container {
+  position: relative;
+  white-space: pre;
+  overflow: scroll;
+}
+
+.shiki-magic-move-move,
+.shiki-magic-move-enter-active,
+.shiki-magic-move-leave-active {
+  transition: all var(--smm-duration) var(--smm-easing);
+}
+
+.shiki-magic-move-move {
+  transition-delay: calc(var(--duration) * var(--smm-delay-move));
+  z-index: 1;
+}
+
+.shiki-magic-move-enter-active {
+  transition-delay: calc(var(--duration) * var(--smm-delay-enter));
+  z-index: 1;
+}
+
+.shiki-magic-move-leave-active {
+  transition-delay: calc(var(--duration) * var(--smm-delay-leave));
+}
+
+.shiki-magic-move-item {
+  display: inline-block;
+}
+
+.shiki-magic-move-enter-from,
+.shiki-magic-move-leave-to {
+  opacity: 0;
+}
+
+br.shiki-magic-move-leave-active {
+  display: none;
+}

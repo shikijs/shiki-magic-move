@@ -5,11 +5,13 @@ export default defineBuildConfig({
     'src/index',
     'src/vue',
     'src/core',
+    {
+      builder: 'mkdist',
+      outDir: 'dist',
+      input: './src',
+      pattern: ['**/*.css'],
+    },
   ],
   declaration: true,
   clean: true,
-  rollup: {
-    emitCJS: true,
-    inlineDependencies: true,
-  },
 })

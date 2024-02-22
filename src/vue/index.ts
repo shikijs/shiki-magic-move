@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import ShikiMagicMove from './ShikiMagicMove.vue'
+import { ShikiMagicMove } from './components/ShikiMagicMove'
 
 export * from './types'
 export * from '../core'

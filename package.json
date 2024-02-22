@@ -13,20 +13,31 @@
     "url": "git+https://github.com/antfu/shiki-magic-move.git"
   },
   "bugs": "https://github.com/antfu/shiki-magic-move/issues",
-  "keywords": [],
+  "keywords": [
+    "shiki",
+    "animations"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
+      "import": "./dist/index.mjs"
+    },
+    "./core": {
+      "import": "./dist/core.mjs"
+    },
+    "./vue": {
+      "import": "./dist/core.mjs"
+    },
+    "./vue/style.css": "./dist/vue/style.css",
+    "./dist/*": "./dist/*"
   },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
+      "./vue": ["./dist/vue.d.ts"],
+      "./core": ["./dist/core.d.ts"],
       "*": [
         "./dist/*",
         "./dist/index.d.ts"
@@ -53,6 +64,9 @@
     "shiki": "^1.1.6",
     "vue": "^3.4.0"
   },
+  "dependencies": {
+    "diff-match-patch": "^1.0.5"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.2",
     "@antfu/ni": "^0.21.12",
@@ -61,7 +75,6 @@
     "@types/node": "^20.10.7",
     "@unocss/reset": "^0.58.5",
     "bumpp": "^9.2.1",
-    "diff-match-patch": "^1.0.5",
     "eslint": "^8.56.0",
     "esno": "^4.0.0",
     "lint-staged": "^15.2.0",
