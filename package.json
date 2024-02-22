@@ -1,7 +1,7 @@
 {
   "name": "shiki-magic-move",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "packageManager": "pnpm@8.14.0",
   "description": "Smoothly animated code blocks with Shiki",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
@@ -36,8 +36,12 @@
   "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "./vue": ["./dist/vue.d.ts"],
-      "./core": ["./dist/core.d.ts"],
+      "./vue": [
+        "./dist/vue.d.ts"
+      ],
+      "./core": [
+        "./dist/core.d.ts"
+      ],
       "*": [
         "./dist/*",
         "./dist/index.d.ts"
