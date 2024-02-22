@@ -26,6 +26,7 @@
 
 .shiki-magic-move-item {
   display: inline-block;
+  transition: color var(--smm-duration) var(--smm-easing), background-color var(--smm-duration) var(--smm-easing);
 }
 
 .shiki-magic-move-enter-from,
