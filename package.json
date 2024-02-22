@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@8.14.0",
-  "description": "_description_",
+  "description": "Smoothly animated code blocks with Shiki",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/antfu",
@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "dev": "unbuild --stub",
+    "dev": "nr play",
     "lint": "eslint .",
     "prepublishOnly": "nr build",
     "release": "bumpp && npm publish",
@@ -46,10 +46,12 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks",
-    "play": "nr -C playground dev"
+    "play": "nr -C playground dev",
+    "play:build": "nr -C playground build"
   },
-  "dependencies": {
-    "shiki": "^1.1.6"
+  "peerDependencies": {
+    "shiki": "^1.1.6",
+    "vue": "^3.4.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.2",
@@ -57,6 +59,7 @@
     "@antfu/utils": "^0.7.7",
     "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^20.10.7",
+    "@unocss/reset": "^0.58.5",
     "bumpp": "^9.2.1",
     "diff-match-patch": "^1.0.5",
     "eslint": "^8.56.0",
@@ -64,9 +67,11 @@
     "lint-staged": "^15.2.0",
     "pnpm": "^8.14.0",
     "rimraf": "^5.0.5",
+    "shiki": "^1.1.6",
     "simple-git-hooks": "^2.9.0",
     "typescript": "^5.3.3",
     "unbuild": "^2.0.0",
+    "unocss": "^0.58.5",
     "vite": "^5.0.11",
     "vitest": "^1.1.3",
     "vue": "^3.4.19"

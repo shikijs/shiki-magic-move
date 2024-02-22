@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getHighlighter } from 'shiki/bundle/web'
-import { matchText, tokenizeWithDiff } from '../src'
+import { diffTokens, matchText } from '../src'
 
 it('exported', async () => {
   const before = `
@@ -47,7 +47,7 @@ const greeting = ref('Hello World!')
     langs: ['vue'],
   })
 
-  expect(tokenizeWithDiff(
+  expect(diffTokens(
     highlighter,
     before,
     after,

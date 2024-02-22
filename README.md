@@ -6,10 +6,9 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-_description_
+Smoothly animated code blocks with Shiki.
 
-> **Note**:
-> Replace `shiki-magic-move`, `_description_` and `antfu` globally to use this template.
+> Working in progress.
 
 ## Sponsors
 

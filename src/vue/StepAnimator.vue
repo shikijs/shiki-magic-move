@@ -1,48 +1,16 @@
 <script setup lang="ts">
-import type { ThemedToken } from 'shiki'
-import { getHighlighter } from 'shiki'
-import { computed, markRaw, nextTick, onMounted, ref } from 'vue'
-import { tokenizeWithDiff } from '../../src/index'
+import type { ThemedToken } from 'shiki/core'
+import { computed, markRaw, onMounted, ref } from 'vue'
+import type { FlattenTokensCode } from '../core'
+import { diffTokens } from '../core'
+import type { AnimationOptions } from './types'
 
-import { after, before } from './code'
-
-export interface AnimationOptions {
-  /**
-   * Duration of the animation in milliseconds
-   *
-   * @default 500
-   */
-  duration?: number
-  /**
-   * Ratio of the duration to delay the move animation
-   *
-   * @default 0.1
-   */
-  delayMove?: number
-  /**
-   * Ratio of the duration to delay the leave animation
-   *
-   * @default 0.1
-   */
-  delayLeave?: number
-  /**
-   * Ratio of the duration to delay the enter animation
-   *
-   * @default 0.8
-   */
-  delayEnter?: number
-  /**
-   * Easing function
-   *
-   * @default 'ease'
-   */
-  easing?: string
-}
-
-const highlighter = await getHighlighter({
-  themes: ['vitesse-light'],
-  langs: ['vue'],
-})
+const props = defineProps<{
+  from: FlattenTokensCode
+  to: FlattenTokensCode
+  animation?: AnimationOptions
+  active?: boolean
+}>()
 
 const {
   duration = 500,
@@ -50,20 +18,10 @@ const {
   delayLeave = 0.1,
   delayEnter = 0.8,
   easing = 'ease',
-} = {} as AnimationOptions
+} = props.animation || {}
 
-const result = markRaw(tokenizeWithDiff(
-  highlighter,
-  before,
-  after,
-  {
-    theme: 'vitesse-light',
-    lang: 'vue',
-  },
-))
-
-const active = ref(false)
-const current = computed(() => active.value ? result.to : result.from)
+const result = markRaw(diffTokens(props.from, props.to))
+const current = computed(() => props.active ? result.to : result.from)
 
 function getTokenKey(token: ThemedToken) {
   const index = result.tokensMap.findIndex(p => p[0] === token || p[1] === token)
@@ -93,27 +51,22 @@ function savePositions() {
     savePosition(el)
 }
 
+function beforeLeave(el: Element | HTMLElement) {
+  const { left, top } = RectMap.get(el) || el.getBoundingClientRect()
+  if ('style' in el) {
+    el.style.position = 'absolute'
+    el.style.top = `${top}px`
+    el.style.left = `${left}px`
+  }
+}
+
+function afterEnter(el: Element | HTMLElement) {
+  savePosition(el)
+}
+
 onMounted(() => {
   savePositions()
 })
-
-function leaveEl(el: Element | HTMLElement) {
-  // debugger
-  const { left, top } = RectMap.get(el) || el.getBoundingClientRect()
-  function applyTransform() {
-    if ('style' in el) {
-      el.style.position = 'absolute'
-      el.style.top = `${top}px`
-      el.style.left = `${left}px`
-    }
-  }
-  // debugger
-  applyTransform()
-  nextTick(() => {
-    // debugger
-    applyTransform()
-  })
-}
 </script>
 
 <template>
@@ -122,29 +75,33 @@ function leaveEl(el: Element | HTMLElement) {
     tag="pre"
     name="shiki-magic-move"
     class="shiki-magic-move-container"
-    @before-leave="leaveEl"
-    @after-enter="savePosition"
+    @before-leave="beforeLeave"
+    @after-enter="afterEnter"
   >
     <template v-for="token of current.flatten" :key="getTokenKey(token)">
-      <br v-if="token.content === '\n'" :data-key="getTokenKey(token)">
-      <span v-else :style="{ color: token.color }" class="shiki-magic-move-item" :data-key="getTokenKey(token)" v-text="token.content" />
+      <br
+        v-if="token.content === '\n'"
+      >
+      <span
+        v-else :style="{ color: token.color }"
+        class="shiki-magic-move-item"
+        :data-key="getTokenKey(token)"
+        v-text="token.content"
+      />
     </template>
   </TransitionGroup>
-  <button @click="active = !active">
-    {{ active }}
-  </button>
 </template>
 
 <style scoped>
 .shiki-magic-move-container {
   display: relative;
+  transition: all var(--duration) v-bind(easing);
 }
 
 .shiki-magic-move-move, /* apply transition to moving elements */
 .shiki-magic-move-enter-active,
 .shiki-magic-move-leave-active {
   --duration: v-bind(`${duration}ms`);
-  /* display: inline-block; */
   transition: all var(--duration) v-bind(easing);
 }
 
@@ -162,6 +119,7 @@ function leaveEl(el: Element | HTMLElement) {
 
 .shiki-magic-move-item {
   display: inline-block;
+  transition: all var(--duration) v-bind(easing);
 }
 
 .shiki-magic-move-enter-from,

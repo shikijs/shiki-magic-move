@@ -1,5 +1,4 @@
-export const before = `
-<script>
+export const vueBefore = `<script>
 export default {
   data() {
     return {
@@ -20,8 +19,7 @@ export default {
 }
 </style>`
 
-export const after = `
-<script setup>
+export const vueAfter = `<script setup>
 import { ref } from 'vue'
 const greeting = ref('Hello World!')
 </script>

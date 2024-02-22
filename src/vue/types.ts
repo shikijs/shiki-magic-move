@@ -1,0 +1,32 @@
+export interface AnimationOptions {
+  /**
+   * Duration of the animation in milliseconds
+   *
+   * @default 500
+   */
+  duration?: number
+  /**
+   * Ratio of the duration to delay the move animation
+   *
+   * @default 0.1
+   */
+  delayMove?: number
+  /**
+   * Ratio of the duration to delay the leave animation
+   *
+   * @default 0.1
+   */
+  delayLeave?: number
+  /**
+   * Ratio of the duration to delay the enter animation
+   *
+   * @default 0.8
+   */
+  delayEnter?: number
+  /**
+   * Easing function
+   *
+   * @default 'ease'
+   */
+  easing?: string
+}
