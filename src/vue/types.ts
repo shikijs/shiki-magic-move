@@ -20,7 +20,7 @@ export interface AnimationOptions {
   /**
    * Ratio of the duration to delay the enter animation
    *
-   * @default 0.8
+   * @default 0.7
    */
   delayEnter?: number
   /**

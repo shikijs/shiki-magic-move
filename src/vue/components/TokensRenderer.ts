@@ -20,7 +20,7 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
         duration = 500,
         delayMove = 0.3,
         delayLeave = 0,
-        delayEnter = 0.8,
+        delayEnter = 0.7,
         easing = 'ease',
       } = props.animation || {}
 

@@ -16,19 +16,18 @@
 }
 
 .shiki-magic-move-move {
-  transition-delay: calc(var(--duration) * var(--smm-delay-move));
+  transition-delay: calc(var(--smm-duration) * var(--smm-delay-move));
   z-index: 1;
 }
 
 .shiki-magic-move-enter-active {
-  transition-delay: calc(var(--duration) * var(--smm-delay-enter));
+  transition-delay: calc(var(--smm-duration) * var(--smm-delay-enter));
   z-index: 1;
 }
 
 .shiki-magic-move-leave-active {
-  transition-delay: calc(var(--duration) * var(--smm-delay-leave));
+  transition-delay: calc(var(--smm-duration) * var(--smm-delay-leave));
 }
-
 
 .shiki-magic-move-enter-from,
 .shiki-magic-move-leave-to {
