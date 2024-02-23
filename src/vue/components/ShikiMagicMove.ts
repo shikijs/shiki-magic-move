@@ -1,7 +1,7 @@
 import type { HighlighterCore } from 'shiki/core'
 import type { PropType } from 'vue'
 import { computed, defineComponent, h } from 'vue'
-import { codeToKeyedTokens, createMagicMoveMachine, syncTokenKeys, toKeyedTokens } from '../../core'
+import { codeToKeyedTokens, createMagicMoveMachine } from '../../core'
 import type { AnimationOptions } from '../types'
 import { TokensRenderer } from './TokensRenderer'
 
@@ -36,7 +36,6 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
         theme: props.theme,
       }),
     )
-
     const tokens = computed(() => machine.commit(props.code))
 
     return () => h(TokensRenderer, {

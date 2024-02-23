@@ -1,8 +1,12 @@
 import type { PropType } from 'vue'
-import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, reactive, ref, renderList } from 'vue'
+import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, ref, renderList } from 'vue'
 import type { KeyedTokensInfo } from '../../core'
 import type { AnimationOptions } from '../types'
 
+/**
+ * Component to render a compiled tokens and animate them.
+ * This is a low-level component.
+ */
 export const TokensRenderer = /* #__PURE__ */ defineComponent({
   name: 'TokensRenderer',
   props: {
