@@ -119,15 +119,33 @@ export function syncTokenKeys(
   // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
   const matches = findTextMatches(from.code, to.code)
   matches.forEach((match) => {
-    const rangeFrom = from.tokens.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1] && !isWhitespace(t.content))
-    const rangeTo = to.tokens.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1] && !isWhitespace(t.content))
+    const tokensF = from.tokens.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1] && !isWhitespace(t.content))
+    const tokensT = to.tokens.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1] && !isWhitespace(t.content))
 
-    rangeTo.forEach((token, i) => {
-      if (token.content === rangeFrom[i]?.content)
-        token.key = rangeFrom[i].key
-      else
-        console.warn('[shiki-magic-move] Mismatched token content', rangeFrom[i], token)
-    })
+    let idxF = 0
+    let idxT = 0
+    while (idxF < tokensF.length && idxT < tokensT.length) {
+      if (!tokensF[idxF] || !tokensT[idxT])
+        break
+      if (tokensF[idxF].content === tokensT[idxT].content) {
+        tokensT[idxT].key = tokensF[idxF].key
+        idxF++
+        idxT++
+      }
+      else if (tokensF[idxF + 1]?.content === tokensT[idxT].content) {
+        // console.log('Token missing match', tokensF[idxF], undefined)
+        idxF++
+      }
+      else if (tokensF[idxF].content === tokensT[idxT + 1]?.content) {
+        // console.log('Token missing match', undefined, tokensT[idxT])
+        idxT++
+      }
+      else {
+        // console.log('Token missing match', tokensF[idxF], tokensT[idxT])
+        idxF++
+        idxT++
+      }
+    }
   })
 
   return to
