@@ -22,6 +22,34 @@ export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootS
 
 type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 
+export function createMagicMoveMachine(
+  codeToKeyedTokens: (code: string) => KeyedTokensInfo,
+) {
+  const EMPTY = Object.freeze(toKeyedTokens('', []))
+  let previous = EMPTY
+  let current = EMPTY
+  function commit(code: string) {
+    previous = current
+    const newTokens = codeToKeyedTokens(code)
+    current = Object.freeze(syncTokenKeys(previous, newTokens))
+    return current
+  }
+
+  return {
+    get current() {
+      return current
+    },
+    get previous() {
+      return previous
+    },
+    commit,
+    reset() {
+      previous = EMPTY
+      current = EMPTY
+    },
+  }
+}
+
 export function codeToKeyedTokens<
   BundledLangKeys extends string,
   BundledThemeKeys extends string,
@@ -156,7 +184,7 @@ export function syncTokenKeys(
  * Find ranges of text matches between two strings
  * It uses `diff-match-patch` under the hood
  */
-export function findTextMatches(a: string, b: string) {
+export function findTextMatches(a: string, b: string): MatchedRanges[] {
   const differ = new DMP()
   const delta = differ.diff_main(a, b)
 
