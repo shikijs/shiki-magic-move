@@ -1,210 +1,92 @@
 import { expect, it } from 'vitest'
 import { getHighlighter } from 'shiki/bundle/web'
-import { diffTokens, flattenTokens } from '../src/core'
+import type { KeyedTokensInfo } from '../src/core'
+import { codeToKeyedTokens, syncTokenKeys } from '../src/core'
 
 it('exported', async () => {
-  const before = `
-<script>
-export default {
-  data() {
-    return {
-      greeting: 'Hello World!'
-    }
-  }
-}
-</script>
+  const code1 = `const a = 1`
+  const code2 = `const a = ref(1 + 1)`
+  const code3 = `const b = ref(2)`
 
-<template>
-  <p class="greeting">{{ greeting }}</p>
-</template>
-
-<style>
-.greeting {
-  color: red;
-  font-weight: bold;
-}
-</style>`
-
-  const after = `
-<script setup>
-import { ref } from 'vue'
-const greeting = ref('Hello World!')
-</script>
-
-<template>
-  <p class="greeting">{{ greeting }}</p>
-</template>
-
-<style>
-.greeting {
-  color: red;
-  font-weight: bold;
-}
-</style>`
-
+  const theme = 'vitesse-light'
+  const lang = 'js'
   const highlighter = await getHighlighter({
-    themes: ['vitesse-light'],
-    langs: ['vue'],
+    themes: [theme],
+    langs: [lang],
   })
 
-  const from = flattenTokens(
-    before,
-    highlighter.codeToTokens(before, {
-      lang: 'vue',
-      theme: 'vitesse-light',
-    }).tokens,
-  )
+  const tokens1 = codeToKeyedTokens(highlighter, code1, { lang, theme })
+  const tokens2 = codeToKeyedTokens(highlighter, code2, { lang, theme })
+  const tokens3 = codeToKeyedTokens(highlighter, code3, { lang, theme })
 
-  const to = flattenTokens(
-    after,
-    highlighter.codeToTokens(after, {
-      lang: 'vue',
-      theme: 'vitesse-light',
-    }).tokens,
-  )
+  normalizeKeys(tokens1, '1')
+  normalizeKeys(tokens2, '2')
+  normalizeKeys(tokens3, '3')
 
-  expect(diffTokens(from, to).tokensMap.slice(0, 10)).toMatchInlineSnapshot(`
+  const originKeys1 = tokens1.tokens.map(t => t.key)
+  const originKeys2 = tokens2.tokens.map(t => t.key)
+  const originKeys3 = tokens3.tokens.map(t => t.key)
+
+  syncTokenKeys(tokens1, tokens2)
+  syncTokenKeys(tokens2, tokens3)
+
+  const syncedKeys1 = tokens1.tokens.map(t => t.key)
+  const syncedKeys2 = tokens2.tokens.map(t => t.key)
+  const syncedKeys3 = tokens3.tokens.map(t => t.key)
+
+  expect(syncedKeys1).toEqual(originKeys1)
+  expect(syncedKeys2).not.toEqual(originKeys2)
+  expect(syncedKeys3).not.toEqual(originKeys3)
+
+  function printDiff(info: KeyedTokensInfo, keys: string[]) {
+    return info.tokens.map((t, i) => {
+      if (t.key === keys[i])
+        return `+ ${t.key} | ${t.content}`
+      return `${keys[i]} -> ${t.key} | ${t.content}`
+    })
+  }
+
+  function normalizeKeys(info: KeyedTokensInfo, name: string) {
+    info.tokens.forEach((t) => {
+      t.key = t.key.replace(info.hash, name)
+    })
+  }
+
+  expect(printDiff(tokens2, originKeys2)).toMatchInlineSnapshot(`
     [
-      [
-        {
-          "color": "#999999",
-          "content": "<",
-          "fontStyle": 0,
-          "offset": 1,
-        },
-        {
-          "color": "#999999",
-          "content": "<",
-          "fontStyle": 0,
-          "offset": 1,
-        },
-      ],
-      [
-        {
-          "color": "#1E754F",
-          "content": "script",
-          "fontStyle": 0,
-          "offset": 2,
-        },
-        {
-          "color": "#1E754F",
-          "content": "script",
-          "fontStyle": 0,
-          "offset": 2,
-        },
-      ],
-      [
-        {
-          "color": "#999999",
-          "content": ">",
-          "fontStyle": 0,
-          "offset": 8,
-        },
-        {
-          "color": "#999999",
-          "content": ">",
-          "fontStyle": 0,
-          "offset": 14,
-        },
-      ],
-      [
-        {
-          "color": "#998418",
-          "content": "greeting",
-          "fontStyle": 0,
-          "offset": 57,
-        },
-        {
-          "color": "#B07D48",
-          "content": "greeting",
-          "fontStyle": 0,
-          "offset": 48,
-        },
-      ],
-      [
-        {
-          "color": "#B5695999",
-          "content": "'",
-          "fontStyle": 0,
-          "offset": 67,
-        },
-        {
-          "color": "#B5695999",
-          "content": "'",
-          "fontStyle": 0,
-          "offset": 63,
-        },
-      ],
-      [
-        {
-          "color": "#B56959",
-          "content": "Hello World!",
-          "fontStyle": 0,
-          "offset": 68,
-        },
-        {
-          "color": "#B56959",
-          "content": "Hello World!",
-          "fontStyle": 0,
-          "offset": 64,
-        },
-      ],
-      [
-        {
-          "color": "#B5695999",
-          "content": "'",
-          "fontStyle": 0,
-          "offset": 80,
-        },
-        {
-          "color": "#B5695999",
-          "content": "'",
-          "fontStyle": 0,
-          "offset": 76,
-        },
-      ],
-      [
-        {
-          "color": "#999999",
-          "content": "</",
-          "fontStyle": 0,
-          "offset": 94,
-        },
-        {
-          "color": "#999999",
-          "content": "</",
-          "fontStyle": 0,
-          "offset": 79,
-        },
-      ],
-      [
-        {
-          "color": "#1E754F",
-          "content": "script",
-          "fontStyle": 0,
-          "offset": 96,
-        },
-        {
-          "color": "#1E754F",
-          "content": "script",
-          "fontStyle": 0,
-          "offset": 81,
-        },
-      ],
-      [
-        {
-          "color": "#999999",
-          "content": ">",
-          "fontStyle": 0,
-          "offset": 102,
-        },
-        {
-          "color": "#999999",
-          "content": ">",
-          "fontStyle": 0,
-          "offset": 87,
-        },
-      ],
+      "2-0 -> 1-0 | const",
+      "+ 2-1 |  ",
+      "2-2 -> 1-2 | a",
+      "+ 2-3 |  ",
+      "2-4 -> 1-4 | =",
+      "+ 2-5 |  ",
+      "+ 2-6 | ref",
+      "+ 2-7 | (",
+      "2-8 -> 1-6 | 1",
+      "+ 2-9 |  ",
+      "+ 2-10 | +",
+      "+ 2-11 |  ",
+      "+ 2-12 | 1",
+      "+ 2-13 | )",
+      "+ 2-14 | 
+    ",
+    ]
+  `)
+
+  expect(printDiff(tokens3, originKeys3)).toMatchInlineSnapshot(`
+    [
+      "3-0 -> 1-0 | const",
+      "+ 3-1 |  ",
+      "+ 3-2 | b",
+      "+ 3-3 |  ",
+      "3-4 -> 1-4 | =",
+      "+ 3-5 |  ",
+      "3-6 -> 2-6 | ref",
+      "3-7 -> 2-7 | (",
+      "+ 3-8 | 2",
+      "3-9 -> 2-13 | )",
+      "+ 3-10 | 
+    ",
     ]
   `)
 })

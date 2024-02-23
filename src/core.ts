@@ -1,5 +1,7 @@
 import { diff_match_patch as DMP } from 'diff-match-patch'
-import type { ThemedToken } from 'shiki/core'
+import type { HighlighterGeneric, ThemedToken, TokensResult } from 'shiki/core'
+import { hash as getHash } from 'ohash'
+import type { ArgumentsType } from 'vitest'
 
 export type Range = [number, number]
 
@@ -9,7 +11,133 @@ export interface MatchedRanges {
   content: string
 }
 
-export function matchText(a: string, b: string) {
+export interface KeyedToken extends ThemedToken {
+  key: string
+}
+
+export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootStyle'> {
+  code: string
+  hash: string
+  tokens: KeyedToken[]
+}
+
+export function codeToKeyedTokens<
+  BundledLangKeys extends string,
+  BundledThemeKeys extends string,
+>(
+  highlighter: HighlighterGeneric<BundledLangKeys, BundledThemeKeys>,
+  code: string,
+  options: ArgumentsType<HighlighterGeneric<BundledLangKeys, BundledThemeKeys>['codeToTokens']>[1],
+): KeyedTokensInfo {
+  const result = highlighter.codeToTokens(code, options)
+  return {
+    ...toKeyedTokens(
+      code,
+      result.tokens,
+    ),
+    bg: result.bg,
+    fg: result.fg,
+    rootStyle: result.rootStyle,
+  }
+}
+
+export function toKeyedTokens(
+  code: string,
+  tokens: ThemedToken[][],
+): KeyedTokensInfo {
+  const hash = getHash(code)
+  let lastOffset = 0
+  return {
+    code,
+    hash,
+    tokens: splitWhitespaceTokens(tokens)
+      .flatMap((line): ThemedToken[] => {
+        const lastEl = line[line.length - 1]
+        if (!lastEl)
+          lastOffset += 1
+        else
+          lastOffset = lastEl.offset + lastEl.content.length
+        return [
+          ...line,
+          {
+            content: '\n',
+            offset: lastOffset,
+          },
+        ]
+      })
+      .map((token, idx) => {
+        const t = token as KeyedToken
+        t.key = `${hash}-${idx}`
+        return t
+      }),
+  }
+}
+
+function splitWhitespaceTokens(tokens: ThemedToken[][]) {
+  return tokens.map((line) => {
+    return line.flatMap((token) => {
+      if (token.content.match(/^\s+$/))
+        return token
+      const match = token.content.match(/^(\s*)(.*?)(\s*)$/)
+      if (!match)
+        return token
+      const [, leading, content, trailing] = match
+      if (!leading && !trailing)
+        return token
+
+      const expanded = [{
+        ...token,
+        offset: token.offset + leading.length,
+        content,
+      }]
+      if (leading) {
+        expanded.unshift({
+          content: leading,
+          offset: token.offset,
+        })
+      }
+      if (trailing) {
+        expanded.push({
+          content: trailing,
+          offset: token.offset + leading.length + content.length,
+        })
+      }
+      return expanded
+    })
+  })
+}
+
+/**
+ * Run diff on two sets of tokens,
+ * and sync the keys from the first set to the second set if those tokens are matched
+ */
+export function syncTokenKeys(
+  from: KeyedTokensInfo,
+  to: KeyedTokensInfo,
+) {
+  // Run the diff and generate matches parts
+  // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
+  const matches = findTextMatches(from.code, to.code)
+  matches.forEach((match) => {
+    const rangeFrom = from.tokens.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1] && !isWhitespace(t.content))
+    const rangeTo = to.tokens.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1] && !isWhitespace(t.content))
+
+    rangeTo.forEach((token, i) => {
+      if (token.content === rangeFrom[i]?.content)
+        token.key = rangeFrom[i].key
+      else
+        console.warn('[shiki-magic-move] Mismatched token content', rangeFrom[i], token)
+    })
+  })
+
+  return to
+}
+
+/**
+ * Find ranges of text matches between two strings
+ * It uses `diff-match-patch` under the hood
+ */
+export function findTextMatches(a: string, b: string) {
   const differ = new DMP()
   const delta = differ.diff_main(a, b)
 
@@ -40,71 +168,6 @@ export function matchText(a: string, b: string) {
     throw new Error('Content mismatch')
 
   return matched
-}
-
-export interface FlattenTokensCode {
-  code: string
-  tokens: ThemedToken[][]
-  flatten: ThemedToken[]
-}
-
-export function flattenTokens(
-  code: string,
-  tokens: ThemedToken[][],
-): FlattenTokensCode {
-  let lastOffset = 0
-  const flatten = tokens.flatMap((line): ThemedToken[] => {
-    const lastEl = line[line.length - 1]
-    if (!lastEl)
-      lastOffset += 1
-    else
-      lastOffset = lastEl.offset + lastEl.content.length
-    return [
-      ...line,
-      {
-        content: '\n',
-        offset: lastOffset,
-      },
-    ]
-  })
-  return { code, tokens, flatten }
-}
-
-export interface DiffTokenOptions {
-  fromCode: string
-  fromTokens: ThemedToken[][]
-  toCode: string
-  toTokens: ThemedToken[][]
-}
-
-export function diffTokens(
-  from: FlattenTokensCode,
-  to: FlattenTokensCode,
-) {
-  const matches = matchText(from.code, to.code)
-
-  const tokensMap: [ThemedToken, ThemedToken][] = []
-
-  matches.forEach((match) => {
-    const rangeFrom = from.flatten.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1] && !isWhitespace(t.content))
-    const rangeTo = to.flatten.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1] && !isWhitespace(t.content))
-
-    if (rangeFrom.length === rangeTo.length) {
-      rangeFrom.forEach((token, i) => {
-        tokensMap.push([token, rangeTo[i]])
-      })
-    }
-    else {
-      console.warn('Mismatched tokens', rangeFrom, rangeTo)
-    }
-  })
-
-  return {
-    matches,
-    from,
-    to,
-    tokensMap,
-  }
 }
 
 function isWhitespace(c: string) {

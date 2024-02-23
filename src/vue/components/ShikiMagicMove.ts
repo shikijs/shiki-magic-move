@@ -1,9 +1,9 @@
 import type { HighlighterCore } from 'shiki/core'
 import type { PropType } from 'vue'
-import { computed, defineComponent, h, markRaw, nextTick, ref, watch } from 'vue'
-import { flattenTokens } from '../../core'
+import { computed, defineComponent, h } from 'vue'
+import { codeToKeyedTokens, syncTokenKeys, toKeyedTokens } from '../../core'
 import type { AnimationOptions } from '../types'
-import { StepAnimator } from './StepAnimator'
+import { TokensRenderer } from './TokensRenderer'
 
 export const ShikiMagicMove = defineComponent({
   name: 'ShikiMagicMove',
@@ -30,58 +30,34 @@ export const ShikiMagicMove = defineComponent({
     },
   },
   setup(props) {
-    const before = ref('')
-    const isActive = ref(true)
+    let previous = toKeyedTokens('', [])
+    let current = previous
+    function commit(code: string) {
+      previous = current
+      const newTokens = codeToKeyedTokens(
+        props.highlighter,
+        code,
+        {
+          lang: props.lang,
+          theme: props.theme,
+        },
+      )
+      current = Object.freeze(syncTokenKeys(previous, newTokens))
+      return current
+    }
 
-    const options = computed(() => ({
-      lang: props.lang,
-      theme: props.theme,
-    }))
+    const tokens = computed(() => commit(props.code))
 
-    const step = computed(() => {
-      const from = markRaw(flattenTokens(
-        before.value,
-        props.highlighter.codeToTokens(before.value, options.value).tokens,
-      ))
-      const toResult = props.highlighter.codeToTokens(props.code, options.value)
-      const to = markRaw(flattenTokens(
-        props.code,
-        toResult.tokens,
-      ))
-      return {
-        from,
-        to,
-        meta: toResult,
-      }
-    })
-
-    watch(
-      () => props.code,
-      (_, old) => {
-        before.value = old
-        isActive.value = false
-      },
-    )
-
-    watch(
-      step,
-      () => {
-        nextTick(() => {
-          isActive.value = true
-        })
-      },
-    )
-
-    return () => h(StepAnimator, {
-      key: step.value.to.code,
-      active: isActive.value,
-      from: step.value.from,
-      to: step.value.to,
+    return () => h(TokensRenderer, {
+      tokens: tokens.value,
       animation: props.animation,
-      style: {
-        color: step.value.meta.fg,
-        backgroundColor: step.value.meta.bg,
-      },
+      style: [
+        {
+          color: tokens.value.fg,
+          backgroundColor: tokens.value.bg,
+        },
+        tokens.value.rootStyle,
+      ],
     })
   },
 })

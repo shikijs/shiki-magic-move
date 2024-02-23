@@ -92,8 +92,8 @@ watch(
 </script>
 
 <template>
-  <div class="h-screen flex flex-col font-sans max-h-screen">
-    <div class="flex flex-col items-center flex-none px4 pt6 text-center">
+  <div class="h-screen flex flex-col font-sans max-h-screen px4 py4 gap-4">
+    <div class="flex flex-col items-center flex-none  text-center">
       <span class="text-2xl font-200 bg-gradient-to-r from-teal to-orange inline-block text-transparent bg-clip-text">
         <span>Shiki</span>
         <span class="font-800 mx1">Magic</span>
@@ -106,63 +106,13 @@ watch(
         Working in progress. Repo is currently private, get early access by <a href="https://github.com/sponsors/antfu" target="_blank" class="underline hover:text-rose">sponsoring Anthony Fu</a>
       </div>
     </div>
-    <div class="grid md:grid-cols-2 p1 py6 md:p6 gap-4 flex-auto of-hidden">
-      <div class="flex flex-col gap-2">
+    <div class="grid md:grid-cols-2 gap-4 flex-auto of-hidden">
+      <div class="of-hidden">
         <textarea
           v-model="input"
           class="font-mono w-full h-full flex-auto p-4 border border-gray:20 rounded bg-transparent"
           @keydown.meta.enter.prevent="commit"
         />
-        <div class="flex-none flex flex-wrap gap-4 items-center">
-          <button class="border border-gray:20 rounded px3 py1" @click="reset">
-            Reset Example
-          </button>
-          <label>
-            <input
-              v-model="autoCommit"
-              type="checkbox"
-            >
-            Auto Commit
-          </label>
-          <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
-            Commit Changes
-          </button>
-          <label class="flex gap-2">
-            Duration
-            <input
-              v-model="duration"
-              type="range" min="100" max="5000"
-              class="border border-gray:20 rounded px2 py1"
-            >
-            {{ duration }}ms
-          </label>
-
-          <div class="flex-auto" />
-          <select
-            v-model="theme"
-            class="border border-gray:20 rounded px2 py1"
-          >
-            <option
-              v-for="t of bundledThemesInfo"
-              :key="t.id"
-              :value="t.id"
-            >
-              {{ t.displayName }}
-            </option>
-          </select>
-          <select
-            v-model="lang"
-            class="border border-gray:20 rounded px2 py1"
-          >
-            <option
-              v-for="l of bundledLanguagesInfo"
-              :key="l.id"
-              :value="l.id"
-            >
-              {{ l.name }}
-            </option>
-          </select>
-        </div>
       </div>
       <div class="of-hidden">
         <ShikiMagicMove
@@ -181,6 +131,56 @@ watch(
           <span class="animate-pulse">Loading...</span>
         </div>
       </div>
+    </div>
+    <div class="flex-none flex flex-wrap gap-4 items-center">
+      <button class="border border-gray:20 rounded px3 py1" @click="reset">
+        Reset Example
+      </button>
+      <label>
+        <input
+          v-model="autoCommit"
+          type="checkbox"
+        >
+        Auto Commit
+      </label>
+      <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
+        Commit Changes
+      </button>
+      <label class="flex gap-2">
+        Duration
+        <input
+          v-model="duration"
+          type="range" min="100" max="5000"
+          class="border border-gray:20 rounded px2 py1"
+        >
+        {{ duration }}ms
+      </label>
+
+      <div class="flex-auto" />
+      <select
+        v-model="theme"
+        class="border border-gray:20 rounded px2 py1"
+      >
+        <option
+          v-for="t of bundledThemesInfo"
+          :key="t.id"
+          :value="t.id"
+        >
+          {{ t.displayName }}
+        </option>
+      </select>
+      <select
+        v-model="lang"
+        class="border border-gray:20 rounded px2 py1"
+      >
+        <option
+          v-for="l of bundledLanguagesInfo"
+          :key="l.id"
+          :value="l.id"
+        >
+          {{ l.name }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
