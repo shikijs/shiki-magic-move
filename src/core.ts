@@ -1,7 +1,6 @@
 import { diff_match_patch as DMP } from 'diff-match-patch'
 import type { HighlighterGeneric, ThemedToken, TokensResult } from 'shiki/core'
 import { hash as getHash } from 'ohash'
-import type { ArgumentsType } from 'vitest'
 
 export type Range = [number, number]
 
@@ -20,6 +19,8 @@ export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootS
   hash: string
   tokens: KeyedToken[]
 }
+
+type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 export function codeToKeyedTokens<
   BundledLangKeys extends string,
