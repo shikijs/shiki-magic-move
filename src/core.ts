@@ -1,4 +1,4 @@
-import { diff_match_patch as DMP } from 'diff-match-patch'
+import { diff } from 'diff-match-patch-es'
 import type { HighlighterGeneric, ThemedToken, TokensResult } from 'shiki/core'
 import { hash as getHash } from 'ohash'
 
@@ -185,8 +185,7 @@ export function syncTokenKeys(
  * It uses `diff-match-patch` under the hood
  */
 export function findTextMatches(a: string, b: string): MatchedRanges[] {
-  const differ = new DMP()
-  const delta = differ.diff_main(a, b)
+  const delta = diff(a, b)
 
   let aContent = ''
   let bContent = ''
