@@ -5,7 +5,7 @@ import { codeToKeyedTokens, syncTokenKeys, toKeyedTokens } from '../../core'
 import type { AnimationOptions } from '../types'
 import { TokensRenderer } from './TokensRenderer'
 
-export const ShikiMagicMove = defineComponent({
+export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
   name: 'ShikiMagicMove',
   props: {
     highlighter: {

@@ -3,7 +3,8 @@ import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, ref
 import type { KeyedTokensInfo } from '../../core'
 import type { AnimationOptions } from '../types'
 
-export const TokensRenderer = defineComponent({
+export const TokensRenderer = /* #__PURE__ */ defineComponent({
+  name: 'TokensRenderer',
   props: {
     tokens: {
       type: Object as PropType<KeyedTokensInfo>,
@@ -35,25 +36,24 @@ export const TokensRenderer = defineComponent({
     const positionMap = new WeakMap <HTMLElement | Element, { left: number, top: number }>()
     const refTransitionGroup = ref<any>()
     const refContainer = computed(() => refTransitionGroup.value?.$el as HTMLPreElement | undefined)
+
     let positionOffset: { left: number, top: number } | undefined
-
-    function savePosition(el: Element) {
-      positionMap.set(el as HTMLElement, getPosition(el))
-    }
-
     function getPositionOffset() {
       if (positionOffset)
         return positionOffset
       const style = getComputedStyle(refContainer.value!)
       const { left: dLeft, top: dTop } = refContainer.value!.getBoundingClientRect()
-
       positionOffset = {
         left: dLeft + Number.parseInt(style.borderLeftWidth),
         top: dTop + Number.parseInt(style.borderTopWidth),
       }
-
+      // Cache only for the current tick
       nextTick(() => positionOffset = undefined)
       return positionOffset
+    }
+
+    function savePosition(el: Element) {
+      positionMap.set(el as HTMLElement, getPosition(el))
     }
 
     function getPosition(el: Element) {
@@ -63,12 +63,6 @@ export const TokensRenderer = defineComponent({
         left: left - offset.left,
         top: top - offset.top,
       }
-    }
-
-    function savePositions() {
-      const children = Array.from(refContainer.value?.children || []) as HTMLElement[]
-      for (const el of children)
-        savePosition(el)
     }
 
     function beforeLeave(el: Element | HTMLElement) {
@@ -85,7 +79,10 @@ export const TokensRenderer = defineComponent({
     }
 
     onMounted(() => {
-      savePositions()
+      // Save positions of all children
+      const children = Array.from(refContainer.value?.children || []) as HTMLElement[]
+      for (const el of children)
+        savePosition(el)
     })
 
     return () => h(
@@ -109,7 +106,8 @@ export const TokensRenderer = defineComponent({
               'style': { color: token.color },
               'class': 'shiki-magic-move-item',
               'key': token.key,
-              'data-key': token.key,
+              // for debug
+              'data-magic-move-key': token.key,
             },
             token.content,
           )
