@@ -1,5 +1,5 @@
 import type { PropType } from 'vue'
-import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, ref, renderList } from 'vue'
+import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, reactive, ref, renderList } from 'vue'
 import type { KeyedTokensInfo } from '../../core'
 import type { AnimationOptions } from '../types'
 
@@ -33,7 +33,7 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       }
     })
 
-    const positionMap = new WeakMap <HTMLElement | Element, { left: number, top: number }>()
+    const positionMap = new WeakMap<HTMLElement | Element, { left: number, top: number }>()
     const refTransitionGroup = ref<any>()
     const refContainer = computed(() => refTransitionGroup.value?.$el as HTMLPreElement | undefined)
 
@@ -65,7 +65,11 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       }
     }
 
-    function beforeLeave(el: Element | HTMLElement) {
+    const enterSet = new Set<Element>()
+    const leaveSet = new Set<Element>()
+
+    function onBeforeLeave(el: Element | HTMLElement) {
+      leaveSet.add(el)
       const { left, top } = positionMap.get(el) || getPosition(el)
       if ('style' in el) {
         el.style.position = 'absolute'
@@ -74,45 +78,83 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       }
     }
 
-    function afterEnter(el: Element | HTMLElement) {
+    function onAfterEnter(el: Element | HTMLElement) {
+      enterSet.delete(el)
       savePosition(el)
+      checkFinished()
     }
 
-    onMounted(() => {
+    function onAfterLeave(el: Element) {
+      leaveSet.delete(el)
+      checkFinished()
+    }
+
+    function checkFinished() {
+      if (leaveSet.size === 0 && enterSet.size === 0)
+        updatePositions()
+      // TODO: emit event
+    }
+
+    function updatePositions() {
       // Save positions of all children
       const children = Array.from(refContainer.value?.children || []) as HTMLElement[]
       for (const el of children)
         savePosition(el)
+    }
+
+    function onBeforeEnter(el: Element) {
+      enterSet.add(el)
+    }
+
+    function onLeaveCancelled(el: Element) {
+      leaveSet.delete(el)
+      el.remove()
+    }
+
+    function onEnterCancelled(el: Element) {
+      enterSet.delete(el)
+      el.remove()
+    }
+
+    onMounted(() => {
+      updatePositions()
     })
 
-    return () => h(
-      TransitionGroup,
-      {
-        ref: refTransitionGroup,
-        tag: 'pre',
-        name: 'shiki-magic-move',
-        class: 'shiki-magic-move-container',
-        style: style.value,
-        onBeforeLeave: beforeLeave,
-        onAfterEnter: afterEnter,
-      },
-      {
-        default: () => renderList(props.tokens.tokens, (token) => {
-          if (token.content === '\n')
-            return h('br', { key: token.key })
-          return h(
-            'span',
-            {
-              'style': { color: token.color },
-              'class': 'shiki-magic-move-item',
-              'key': token.key,
-              // for debug
-              'data-magic-move-key': token.key,
-            },
-            token.content,
-          )
-        }),
-      },
-    )
+    return () => {
+      return h(
+        TransitionGroup,
+        {
+          ref: refTransitionGroup,
+          tag: 'pre',
+          name: 'shiki-magic-move',
+          class: 'shiki-magic-move-container',
+          style: style.value,
+
+          onAfterEnter,
+          onAfterLeave,
+          onBeforeEnter,
+          onBeforeLeave,
+          onEnterCancelled,
+          onLeaveCancelled,
+        },
+        {
+          default: () => renderList(props.tokens.tokens, (token) => {
+            if (token.content === '\n')
+              return h('br', { key: token.key })
+            return h(
+              'span',
+              {
+                'style': { color: token.color },
+                'class': 'shiki-magic-move-item',
+                'key': token.key,
+                // for debug
+                'data-magic-move-key': token.key,
+              },
+              token.content,
+            )
+          }),
+        },
+      )
+    }
   },
 })
