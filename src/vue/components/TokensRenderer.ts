@@ -1,8 +1,9 @@
 import type { PropType } from 'vue'
-import { computed, defineComponent, h, onMounted, ref, renderList } from 'vue'
+import { computed, defineComponent, h, nextTick, onMounted, ref, renderList } from 'vue'
 import type { KeyedTokensInfo } from '../../core'
 import type { AnimationOptions } from '../types'
 import { TransitionGroup } from './vendor/TransitionGroup'
+import { forceReflow } from './vendor/Transition'
 
 /**
  * Component to render a compiled tokens and animate them.
@@ -18,6 +19,10 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
     animation: {
       type: Object as PropType<AnimationOptions>,
     },
+    animateContainer: {
+      type: Boolean,
+      default: true,
+    },
     /**
      * When parents are scaled, it will chose getBoundingClientRect() to be incorrect.
      * Have to pass the global scale to fix the positions.
@@ -27,7 +32,11 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       default: 1,
     },
   },
-  setup(props) {
+  emits: [
+    'finished',
+    'start',
+  ],
+  setup(props, { emit }) {
     const style = computed(() => {
       const {
         duration = 500,
@@ -49,6 +58,7 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
     const positionMap = new WeakMap<HTMLElement | Element, { left: number, top: number }>()
     const refTransitionGroup = ref<any>()
     const refContainer = computed(() => refTransitionGroup.value?.$el as HTMLPreElement | undefined)
+    const containerSize: { width: number, height: number } = { width: 0, height: 0 }
 
     const enterSet = new Set<Element>()
     const leaveSet = new Set<Element>()
@@ -67,7 +77,15 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       }
     }
 
+    function onBeforeEnter(el: Element) {
+      if (leaveSet.size === 0 && enterSet.size === 0)
+        onStarted()
+      enterSet.add(el)
+    }
+
     function onBeforeLeave(el: Element | HTMLElement) {
+      if (leaveSet.size === 0 && enterSet.size === 0)
+        onStarted()
       leaveSet.add(el)
       const { left, top } = positionMap.get(el) || getPosition(el)
       if ('style' in el) {
@@ -88,21 +106,68 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
       checkFinished()
     }
 
+    function onFinished() {
+      emit('finished')
+      updatePositions()
+    }
+
+    function onStarted() {
+      emit('start')
+      if (props.animateContainer) {
+        nextTick(() => {
+          const el = refContainer.value
+          if (!el)
+            return
+          const rect = el.getBoundingClientRect()
+          if (rect.width === containerSize.width && rect.height === containerSize.height)
+            return
+
+          el.style.transitionDuration = '0ms'
+          el.style.transitionDelay = '0ms'
+          el.style.height = `${containerSize.height / props.globalScale}px`
+          el.style.width = `${containerSize.width / props.globalScale}px`
+
+          forceReflow()
+
+          el.style.transitionTimingFunction = 'var(--smm-easing)'
+          el.style.transitionDelay = 'var(--smm-delay-move)'
+          el.style.transitionProperty = 'height, width'
+          el.style.transitionDuration = 'var(--smm-duration)'
+          el.style.height = `${rect.height / props.globalScale}px`
+          el.style.width = `${rect.width / props.globalScale}px`
+
+          const onTransitionEnd = (e: TransitionEvent) => {
+            if (!e || e.target !== el)
+              return
+            if (['height', 'width'].includes(e.propertyName)) {
+              el.style.transitionProperty = ''
+              el.style.transitionDuration = ''
+              el.style.height = ''
+              el.style.width = ''
+              el.removeEventListener('transitionend', onTransitionEnd)
+            }
+          }
+          el.addEventListener('transitionend', onTransitionEnd)
+        })
+      }
+    }
+
     function checkFinished() {
       if (leaveSet.size === 0 && enterSet.size === 0)
-        updatePositions()
-      // TODO: emit event
+        onFinished()
     }
 
     function updatePositions() {
+      const rect = refContainer.value?.getBoundingClientRect()
+      if (rect) {
+        containerSize.width = rect.width
+        containerSize.height = rect.height
+      }
+
       // Save positions of all children
       const children = Array.from(refContainer.value?.children || []) as HTMLElement[]
       for (const el of children)
         savePosition(el)
-    }
-
-    function onBeforeEnter(el: Element) {
-      enterSet.add(el)
     }
 
     function onLeaveCancelled(el: Element) {
