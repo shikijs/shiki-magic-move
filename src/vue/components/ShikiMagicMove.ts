@@ -28,6 +28,10 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
       type: Object as PropType<AnimationOptions>,
       default: () => ({}),
     },
+    globalScale: {
+      type: Number,
+      default: 1,
+    },
   },
   setup(props) {
     const machine = createMagicMoveMachine(code =>
@@ -41,6 +45,7 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
     return () => h(TokensRenderer, {
       tokens: tokens.value,
       animation: props.animation,
+      globalScale: props.globalScale,
       style: [
         {
           color: tokens.value.fg,

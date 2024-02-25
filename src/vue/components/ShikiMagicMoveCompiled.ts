@@ -23,6 +23,10 @@ export const ShikiMagicMoveCompiled = /* #__PURE__ */ defineComponent({
       type: Object as PropType<AnimationOptions>,
       default: () => ({}),
     },
+    globalScale: {
+      type: Number,
+      default: 1,
+    },
   },
   setup(props) {
     const current = computed(() => props.steps[props.step])
@@ -30,6 +34,7 @@ export const ShikiMagicMoveCompiled = /* #__PURE__ */ defineComponent({
     return () => h(TokensRenderer, {
       tokens: current.value,
       animation: props.animation,
+      globalScale: props.globalScale,
     })
   },
 })

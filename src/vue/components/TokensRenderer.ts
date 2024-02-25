@@ -1,7 +1,8 @@
 import type { PropType } from 'vue'
-import { TransitionGroup, computed, defineComponent, h, nextTick, onMounted, ref, renderList } from 'vue'
+import { computed, defineComponent, h, onMounted, ref, renderList } from 'vue'
 import type { KeyedTokensInfo } from '../../core'
 import type { AnimationOptions } from '../types'
+import { TransitionGroup } from './vendor/TransitionGroup'
 
 /**
  * Component to render a compiled tokens and animate them.
@@ -17,13 +18,21 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
     animation: {
       type: Object as PropType<AnimationOptions>,
     },
+    /**
+     * When parents are scaled, it will chose getBoundingClientRect() to be incorrect.
+     * Have to pass the global scale to fix the positions.
+     */
+    globalScale: {
+      type: Number,
+      default: 1,
+    },
   },
   setup(props) {
     const style = computed(() => {
       const {
         duration = 500,
         delayMove = 0.3,
-        delayLeave = 0,
+        delayLeave = 0.1,
         delayEnter = 0.7,
         easing = 'ease',
       } = props.animation || {}
@@ -41,44 +50,30 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
     const refTransitionGroup = ref<any>()
     const refContainer = computed(() => refTransitionGroup.value?.$el as HTMLPreElement | undefined)
 
-    let positionOffset: { left: number, top: number } | undefined
-    function getPositionOffset() {
-      if (positionOffset)
-        return positionOffset
-      const style = getComputedStyle(refContainer.value!)
-      const { left: dLeft, top: dTop } = refContainer.value!.getBoundingClientRect()
-      positionOffset = {
-        left: dLeft + Number.parseInt(style.borderLeftWidth),
-        top: dTop + Number.parseInt(style.borderTopWidth),
-      }
-      // Cache only for the current tick
-      nextTick(() => positionOffset = undefined)
-      return positionOffset
-    }
+    const enterSet = new Set<Element>()
+    const leaveSet = new Set<Element>()
+    const anchor = ref<HTMLElement>()
 
     function savePosition(el: Element) {
       positionMap.set(el as HTMLElement, getPosition(el))
     }
 
     function getPosition(el: Element) {
-      const { left, top } = el.getBoundingClientRect()
-      const offset = getPositionOffset()
+      const e = el.getBoundingClientRect()
+      const a = anchor.value!.getBoundingClientRect()
       return {
-        left: left - offset.left,
-        top: top - offset.top,
+        left: e.left - a.left,
+        top: e.top - a.top,
       }
     }
-
-    const enterSet = new Set<Element>()
-    const leaveSet = new Set<Element>()
 
     function onBeforeLeave(el: Element | HTMLElement) {
       leaveSet.add(el)
       const { left, top } = positionMap.get(el) || getPosition(el)
       if ('style' in el) {
         el.style.position = 'absolute'
-        el.style.top = `${top}px`
-        el.style.left = `${left}px`
+        el.style.top = `${top / props.globalScale}px`
+        el.style.left = `${left / props.globalScale}px`
       }
     }
 
@@ -134,6 +129,9 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
           class: 'shiki-magic-move-container shiki',
           style: [style.value, props.tokens.rootStyle],
 
+          // This props is provided by local modifications of TransitionGroup
+          globalScale: props.globalScale,
+
           onAfterEnter,
           onAfterLeave,
           onBeforeEnter,
@@ -142,21 +140,30 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
           onLeaveCancelled,
         },
         {
-          default: () => renderList(props.tokens.tokens, (token) => {
-            if (token.content === '\n')
-              return h('br', { key: token.key })
-            return h(
-              'span',
-              {
-                'style': [{ color: token.color }, token.htmlStyle],
-                'class': 'shiki-magic-move-item',
-                'key': token.key,
-                // for debug
-                'data-magic-move-key': token.key,
-              },
-              token.content,
-            )
-          }),
+          default: () => [
+            // Use a empty anchor div to calculate the relative position when setting absolute position
+            h('div', {
+              key: 'anchor',
+              ref: anchor,
+              style: 'position:absolute;top:0;left:0;width:1px;height:1px;',
+            }),
+            // Render the tokens, TransitionGroup will handle the animations for elements with the same key
+            renderList(props.tokens.tokens, (token) => {
+              if (token.content === '\n')
+                return h('br', { key: token.key })
+              return h(
+                'span',
+                {
+                  'style': [{ color: token.color }, token.htmlStyle],
+                  'class': 'shiki-magic-move-item',
+                  'key': token.key,
+                  // for debug
+                  'data-magic-move-key': token.key,
+                },
+                token.content,
+              )
+            }),
+          ],
         },
       )
     }
