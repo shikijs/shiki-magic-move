@@ -131,8 +131,8 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
           ref: refTransitionGroup,
           tag: 'pre',
           name: 'shiki-magic-move',
-          class: 'shiki-magic-move-container',
-          style: style.value,
+          class: 'shiki-magic-move-container shiki',
+          style: [style.value, props.tokens.rootStyle],
 
           onAfterEnter,
           onAfterLeave,
@@ -148,7 +148,7 @@ export const TokensRenderer = /* #__PURE__ */ defineComponent({
             return h(
               'span',
               {
-                'style': { color: token.color },
+                'style': [{ color: token.color }, token.htmlStyle],
                 'class': 'shiki-magic-move-item',
                 'key': token.key,
                 // for debug
