@@ -3,6 +3,8 @@ import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
 import type { KeyedToken, KeyedTokensInfo, MatchedRanges } from './types'
 
+export * from './types'
+
 type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 export function createMagicMoveMachine(

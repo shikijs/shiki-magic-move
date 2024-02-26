@@ -1,4 +1,3 @@
-import { debug } from 'node:console'
 import type { KeyedToken, KeyedTokensInfo, MagicMoveRenderOptions } from './types'
 
 const CLASS_PREFIX = 'shiki-magic-move'

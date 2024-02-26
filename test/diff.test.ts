@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 import { getHighlighter } from 'shiki/bundle/web'
-import type { KeyedTokensInfo } from '../src/KeyedTokensInfo'
+import type { KeyedTokensInfo } from '../src/types'
 import { codeToKeyedTokens, syncTokenKeys } from '../src/core'
 
 it('diff1', async () => {
