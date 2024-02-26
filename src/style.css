@@ -1,7 +1,6 @@
 .shiki-magic-move-container {
   position: relative;
   white-space: pre;
-  overflow: scroll;
 }
 
 .shiki-magic-move-item {

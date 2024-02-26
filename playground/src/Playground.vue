@@ -102,7 +102,7 @@ watch(
         <span class="italic font-serif">Move</span>
       </span>
       <div class="text-stone:75">
-        Smoothly animated code blocks with <a href="https://github.com/shikijs/shiki" target="_blank" class="underline">Shiki</a> & Vue <sup>(demo)</sup>
+        Smoothly animated code blocks with <a href="https://github.com/shikijs/shiki" target="_blank" class="underline">Shiki</a><sup>(demo)</sup>
       </div>
       <div class="text-stone:50 italic">
         Working in progress. Repo is currently private, get early access by <a href="https://github.com/sponsors/antfu" target="_blank" class="underline hover:text-rose">sponsoring Anthony Fu</a>
@@ -123,8 +123,8 @@ watch(
           :code="code"
           :lang="lang"
           :theme="theme"
-          :animation="{ duration }"
-          class="font-mono p-4 border border-gray:20 shadow-xl rounded max-h-full of-scroll"
+          :options="{ duration }"
+          class="font-mono p-4 border border-gray:20 shadow-xl rounded"
           @start="isAnimating = true"
           @end="isAnimating = false"
         />

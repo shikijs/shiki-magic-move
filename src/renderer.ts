@@ -1,3 +1,4 @@
+import { debug } from 'node:console'
 import type { KeyedToken, KeyedTokensInfo, MagicMoveRenderOptions } from './types'
 
 const CLASS_PREFIX = 'shiki-magic-move'
@@ -54,6 +55,8 @@ export class MagicMoveRenderer {
     this.anchor.style.position = 'absolute'
     this.anchor.style.top = '0'
     this.anchor.style.left = '0'
+    this.anchor.style.height = '1px'
+    this.anchor.style.width = '1px'
 
     this.container.prepend(this.anchor)
   }
@@ -113,13 +116,17 @@ export class MagicMoveRenderer {
     this.previousPromises.forEach(p => p.resolve())
     this.previousPromises = []
 
+    const {
+      globalScale: scale,
+    } = this.options
+
     // Record the current position of the elements (before rerendering)
     const position = new Map<HTMLElement, { x: number, y: number }>()
-    const anchorRect = this.anchor.getBoundingClientRect()
+    let anchorRect = this.anchor.getBoundingClientRect()
     const containerRect = this.container.getBoundingClientRect()
     for (const el of this.mapDom.values()) {
       const rect = el.getBoundingClientRect()
-      position.set(el, { x: rect.x, y: rect.y })
+      position.set(el, { x: rect.x - anchorRect.x, y: rect.y - anchorRect.y })
     }
 
     const newChildren = step.tokens.map((token) => {
@@ -140,8 +147,14 @@ export class MagicMoveRenderer {
       }
     })
 
-    for (const [_, el] of this.mapDom)
+    for (const [_, el] of this.mapDom) {
+      if (el.tagName === 'BR')
+        continue
       leave.add(el)
+    }
+
+    for (const el of leave)
+      el.style.position = 'absolute'
 
     // Update DOM
     this.container.replaceChildren(
@@ -159,8 +172,8 @@ export class MagicMoveRenderer {
     for (const el of leave) {
       el.style.position = 'absolute'
       const pos = position.get(el)!
-      el.style.top = `${(pos.y - anchorRect.y) / this.options.globalScale}px`
-      el.style.left = `${(pos.x - anchorRect.x) / this.options.globalScale}px`
+      el.style.top = `${pos.y / scale}px`
+      el.style.left = `${pos.x / scale}px`
 
       el.classList.add(CLASS_LEAVE_FROM)
       el.classList.add(CLASS_LEAVE_ACTIVE)
@@ -201,14 +214,17 @@ export class MagicMoveRenderer {
       }
     }
 
+    // We recalculate the anchor position because the container might be moved
+    anchorRect = this.anchor.getBoundingClientRect()
     // Set the position of the move elements to the old position
     // Set the transition duration to 0ms to make it immediate
     for (const el of move) {
-      const newPos = el.getBoundingClientRect()
+      const newRect = el.getBoundingClientRect()
+      const newPos = { x: newRect.x - anchorRect.x, y: newRect.y - anchorRect.y }
       const oldPos = position.get(el)!
       el.style.transitionDuration = el.style.transitionDelay = '0ms'
-      const dx = (oldPos.x - newPos.x) / this.options.globalScale
-      const dy = (oldPos.y - newPos.y) / this.options.globalScale
+      const dx = (oldPos.x - newPos.x) / scale
+      const dy = (oldPos.y - newPos.y) / scale
       el.style.transform = `translate(${dx}px, ${dy}px)`
 
       postReflow.push(() => {
@@ -229,14 +245,14 @@ export class MagicMoveRenderer {
       const newRect = this.container.getBoundingClientRect()
       if (newRect.width !== containerRect.width || newRect.height !== containerRect.height) {
         this.container.style.transitionDuration = this.container.style.transitionDelay = '0ms'
-        this.container.style.height = `${containerRect.height}px`
-        this.container.style.width = `${containerRect.width}px`
+        this.container.style.height = `${containerRect.height / scale}px`
+        this.container.style.width = `${containerRect.width / scale}px`
 
         postReflow.push(() => {
           this.container.classList.add(CLASS_CONTAINER)
           this.container.style.transitionDuration = this.container.style.transitionDelay = ''
-          this.container.style.height = `${newRect.height}px`
-          this.container.style.width = `${newRect.width}px`
+          this.container.style.height = `${newRect.height / scale}px`
+          this.container.style.width = `${newRect.width / scale}px`
         })
 
         promises.push(
