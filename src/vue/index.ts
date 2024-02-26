@@ -1,12 +1,16 @@
 import type { App } from 'vue'
-import { ShikiMagicMove } from './components/ShikiMagicMove'
+import { ShikiMagicMove } from './ShikiMagicMove'
+import { ShikiMagicMovePrecompiled } from './ShikiMagicMovePrecompiled'
+import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
-export * from './types'
-
-export { ShikiMagicMove }
-export { ShikiMagicMoveCompiled } from './components/ShikiMagicMoveCompiled'
-export { TokensRenderer } from './components/TokensRenderer'
+export {
+  ShikiMagicMove,
+  ShikiMagicMovePrecompiled,
+  ShikiMagicMoveRenderer,
+}
 
 export function install(app: App<any>) {
   app.component('ShikiMagicMove', ShikiMagicMove)
+  app.component('ShikiMagicMovePrecompiled', ShikiMagicMovePrecompiled)
+  app.component('ShikiMagicMoveRenderer', ShikiMagicMoveRenderer)
 }

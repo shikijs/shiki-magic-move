@@ -1,24 +1,7 @@
 import { diff } from 'diff-match-patch-es'
-import type { HighlighterGeneric, ThemedToken, TokensResult } from 'shiki/core'
+import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
-
-export type Range = [number, number]
-
-export interface MatchedRanges {
-  from: Range
-  to: Range
-  content: string
-}
-
-export interface KeyedToken extends ThemedToken {
-  key: string
-}
-
-export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootStyle'> {
-  code: string
-  hash: string
-  tokens: KeyedToken[]
-}
+import type { KeyedToken, KeyedTokensInfo, MatchedRanges } from './types'
 
 type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 

@@ -5,6 +5,8 @@ export default defineBuildConfig({
     'src/index',
     'src/vue',
     'src/core',
+    'src/types',
+    'src/renderer',
     {
       builder: 'mkdist',
       outDir: 'dist',

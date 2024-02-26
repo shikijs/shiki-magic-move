@@ -25,10 +25,16 @@
     "./core": {
       "import": "./dist/core.mjs"
     },
+    "./renderer": {
+      "import": "./dist/renderer.mjs"
+    },
+    "./types": {
+      "import": "./dist/types.mjs"
+    },
     "./vue": {
       "import": "./dist/vue.mjs"
     },
-    "./vue/style.css": "./dist/vue/style.css",
+    "./style.css": "./dist/style.css",
     "./dist/*": "./dist/*"
   },
   "main": "./dist/index.mjs",

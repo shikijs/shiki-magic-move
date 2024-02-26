@@ -12,6 +12,8 @@ const lang = ref('vue')
 
 const highlighter = ref<Highlighter>()
 
+const isAnimating = ref(false)
+
 const loadingPromise = shallowRef<Promise<void> | undefined>(
   getHighlighter({
     themes: [theme.value],
@@ -114,7 +116,7 @@ watch(
           @keydown.meta.enter.prevent="commit"
         />
       </div>
-      <div class="of-hidden">
+      <div class="of-auto">
         <ShikiMagicMove
           v-if="highlighter && !loadingPromise"
           :highlighter="highlighter"
@@ -122,7 +124,9 @@ watch(
           :lang="lang"
           :theme="theme"
           :animation="{ duration }"
-          class="font-mono w-full h-full p-4 border border-gray:20 shadow-xl rounded max-h-full of-scroll"
+          class="font-mono p-4 border border-gray:20 shadow-xl rounded max-h-full of-scroll"
+          @start="isAnimating = true"
+          @end="isAnimating = false"
         />
         <div
           v-else
@@ -130,6 +134,10 @@ watch(
         >
           <span class="animate-pulse">Loading...</span>
         </div>
+        <!-- Events is not yet working well -->
+        <!-- <div v-if="isAnimating" class="py2 animate-pulse text-green">
+          Animating...
+        </div> -->
       </div>
     </div>
     <div class="flex-none flex flex-wrap gap-4 items-center">

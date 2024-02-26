@@ -1,9 +1,9 @@
 import type { HighlighterCore } from 'shiki/core'
 import type { PropType } from 'vue'
 import { computed, defineComponent, h } from 'vue'
-import { codeToKeyedTokens, createMagicMoveMachine } from '../../core'
-import type { AnimationOptions } from '../types'
-import { TokensRenderer } from './TokensRenderer'
+import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
+import type { MagicMoveRenderOptions } from '../types'
+import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
   name: 'ShikiMagicMove',
@@ -24,16 +24,16 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
       type: String,
       required: true,
     },
-    animation: {
-      type: Object as PropType<AnimationOptions>,
+    options: {
+      type: Object as PropType<MagicMoveRenderOptions>,
       default: () => ({}),
     },
-    globalScale: {
-      type: Number,
-      default: 1,
-    },
   },
-  setup(props) {
+  emits: [
+    'start',
+    'end',
+  ],
+  setup(props, { emit }) {
     const machine = createMagicMoveMachine(code =>
       codeToKeyedTokens(props.highlighter, code, {
         lang: props.lang,
@@ -42,10 +42,11 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
     )
     const tokens = computed(() => machine.commit(props.code))
 
-    return () => h(TokensRenderer, {
+    return () => h(ShikiMagicMoveRenderer, {
       tokens: tokens.value,
-      animation: props.animation,
-      globalScale: props.globalScale,
+      options: props.options,
+      onStart: () => emit('start'),
+      onEnd: () => emit('end'),
       style: [
         {
           color: tokens.value.fg,
