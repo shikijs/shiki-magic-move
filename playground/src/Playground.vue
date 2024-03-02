@@ -102,10 +102,8 @@ watch(
         <span class="italic font-serif">Move</span>
       </span>
       <div class="text-stone:75">
-        Smoothly animated code blocks with <a href="https://github.com/shikijs/shiki" target="_blank" class="underline">Shiki</a><sup>(demo)</sup>
-      </div>
-      <div class="text-stone:50 italic">
-        Working in progress. Repo is currently private, get early access by <a href="https://github.com/sponsors/antfu" target="_blank" class="underline hover:text-rose">sponsoring Anthony Fu</a>
+        Smoothly animated code blocks with <a href="https://github.com/shikijs/shiki" target="_blank" class="underline">Shiki</a>.
+        <a href="https://github.com/shikijs/shiki-magic-move" target="_blank" class="underline">GitHub</a>
       </div>
     </div>
     <div class="grid md:grid-cols-2 gap-4 flex-auto of-hidden">
