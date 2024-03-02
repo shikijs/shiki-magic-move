@@ -6,9 +6,17 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-Smoothly animated code blocks with Shiki.
+Smoothly animated code blocks with Shiki. [Online Demo](https://shiki-magic-move.netlify.app/).
 
-> Working in progress.
+## Usage
+
+This is a rather low-level library, you usually want to use it with a high-level integrations like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
+
+If you want to integrate it into your own project, you might want to read the source code a bit.
+
+## How it works
+
+[I](https://github.com/antfu) am writing a blog post explaining the details, stay tuned!
 
 ## Sponsors
 
