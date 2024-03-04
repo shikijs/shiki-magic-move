@@ -1,4 +1,4 @@
-import { diff, diffCleanupEfficiency, diffCleanupMerge, diffCleanupSemantic } from 'diff-match-patch-es'
+import { diff } from 'diff-match-patch-es'
 import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
 import type { KeyedToken, KeyedTokensInfo, MagicMoveDifferOptions, MatchedRanges } from './types'
@@ -207,16 +207,16 @@ export function syncTokenKeys(
   options: MagicMoveDifferOptions = {},
 ): { from: KeyedTokensInfo, to: KeyedTokensInfo } {
   const {
-    splitBreakpoints = true,
+    splitTokens: shouldSplitTokens = false,
   } = options
 
   // Run the diff and generate matches parts
   // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
   const matches = findTextMatches(from.code, to.code, options)
-  const tokensFrom = splitBreakpoints
+  const tokensFrom = shouldSplitTokens
     ? splitTokens(from.tokens, matches.flatMap(m => m.from))
     : from.tokens
-  const tokensTo = splitBreakpoints
+  const tokensTo = shouldSplitTokens
     ? splitTokens(to.tokens, matches.flatMap(m => m.to))
     : to.tokens
 
@@ -265,19 +265,8 @@ export function findTextMatches(
   b: string,
   options: MagicMoveDifferOptions = {},
 ): MatchedRanges[] {
-  const delta = diff(a, b)
-  const {
-    diffCleanup = 'semantic',
-  } = options
-
-  if (diffCleanup === 'semantic')
-    diffCleanupSemantic(delta)
-  else if (diffCleanup === 'efficiency')
-    diffCleanupEfficiency(delta)
-  else if (diffCleanup === 'merge')
-    diffCleanupMerge(delta)
-  else if (typeof diffCleanup === 'function')
-    diffCleanup(delta)
+  let delta = diff(a, b)
+  delta = options.diffCleanup?.(delta) || delta
 
   let aContent = ''
   let bContent = ''

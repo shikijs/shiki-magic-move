@@ -73,13 +73,13 @@ export interface MagicMoveRenderOptions {
 
 export interface MagicMoveDifferOptions {
   /**
-   * Split the tokens into separate lines
+   * Split the tokens at the edge of diff chunks
    *
-   * @default true
+   * @default false
    */
-  splitBreakpoints?: boolean
+  splitTokens?: boolean
   /**
    * Algorithm to use to cleanup the diff
    */
-  diffCleanup?: 'none' | 'semantic' | 'efficiency' | 'merge' | ((diffs: Diff[]) => void)
+  diffCleanup?: ((diffs: Diff[]) => Diff[] | void)
 }
