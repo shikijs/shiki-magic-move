@@ -82,4 +82,8 @@ export interface MagicMoveDifferOptions {
    * Algorithm to use to cleanup the diff
    */
   diffCleanup?: ((diffs: Diff[]) => Diff[] | void)
+  /**
+   * Enhance the matching algorithm to match tokens that has same content
+   */
+  enhanceMatching?: boolean
 }

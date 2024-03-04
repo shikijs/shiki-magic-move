@@ -208,6 +208,7 @@ export function syncTokenKeys(
 ): { from: KeyedTokensInfo, to: KeyedTokensInfo } {
   const {
     splitTokens: shouldSplitTokens = false,
+    enhanceMatching = true,
   } = options
 
   // Run the diff and generate matches parts
@@ -220,6 +221,8 @@ export function syncTokenKeys(
     ? splitTokens(to.tokens, matches.flatMap(m => m.to))
     : to.tokens
 
+  const matchedKeys = new Set<string>()
+
   matches.forEach((match) => {
     const tokensF = tokensFrom.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1])
     const tokensT = tokensTo.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1])
@@ -230,7 +233,9 @@ export function syncTokenKeys(
       if (!tokensF[idxF] || !tokensT[idxT])
         break
       if (tokensF[idxF].content === tokensT[idxT].content) {
+        // assign the key from the first set to the second set
         tokensT[idxT].key = tokensF[idxF].key
+        matchedKeys.add(tokensF[idxF].key)
         idxF++
         idxT++
       }
@@ -249,6 +254,20 @@ export function syncTokenKeys(
       }
     }
   })
+
+  if (enhanceMatching) {
+    for (const token of tokensFrom) {
+      if (matchedKeys.has(token.key))
+        continue
+      if (token.content.length < 3 || !token.content.match(/^[\w\d_-]+$/))
+        continue
+      const matched = tokensTo.find(t => t.content === token.content && !matchedKeys.has(t.key))
+      if (matched) {
+        matched.key = token.key
+        matchedKeys.add(token.key)
+      }
+    }
+  }
 
   return {
     from: tokensFrom.length === from.tokens.length ? from : { ...from, tokens: tokensFrom },

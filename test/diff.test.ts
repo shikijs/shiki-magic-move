@@ -177,6 +177,134 @@ it('diff2', async () => {
   `)
 })
 
+it('diff3 enhanceMatching', async () => {
+  const code1 = `
+  <script>
+  import { defineComponent } from 'vue'
+  
+  export default defineComponent({
+    data: () => ({
+      count: 1
+    }),
+    computed: {
+      double() {
+        return this.count * 2
+      }
+    },
+  })
+  </script>
+  `.trim()
+
+  const code2 = `
+  <script setup>
+  import { ref, computed } from 'vue'
+  
+  const count = ref(1)
+  const double = computed(() => count.value * 2)
+  </script>
+  `.trim()
+
+  const theme = 'vitesse-light'
+  const lang = 'vue'
+  const highlighter = await getHighlighter({
+    themes: [theme],
+    langs: [lang],
+  })
+
+  const tokens1 = codeToKeyedTokens(highlighter, code1, { lang, theme })
+  const tokens2 = codeToKeyedTokens(highlighter, code2, { lang, theme })
+
+  normalizeKeys(tokens1, '1')
+  normalizeKeys(tokens2, '2')
+
+  //   const originKeys1 = tokens1.tokens.map(t => t.key)
+  const originKeys2 = tokens2.tokens.map(t => t.key)
+
+  function clone<T>(tokens: T): T {
+    return JSON.parse(JSON.stringify(tokens))
+  }
+
+  const tokens2WithoutEnhance = syncTokenKeys(tokens1, clone(tokens2), {
+    enhanceMatching: false,
+  }).to
+
+  const tokens2WithEnhance = syncTokenKeys(tokens1, clone(tokens2), {
+    enhanceMatching: true,
+  }).to
+
+  expect(printDiff(tokens2WithoutEnhance, originKeys2))
+    .not.toEqual(printDiff(tokens2WithEnhance, originKeys2))
+
+  expect(printDiff(tokens2WithEnhance, originKeys2)).toMatchInlineSnapshot(`
+    "
+    1-0                  <
+    1-1                  script
+            2-2           
+            2-3          setup
+    1-2                  >
+    1-3                  ⏎
+    1-4                    
+    1-5                  import
+    1-6                   
+    1-7                  {
+    1-8                   
+            2-11         ref
+            2-12         ,
+            2-13          
+            2-14         computed
+    1-10                  
+    1-11                 }
+    1-12                  
+    1-13                 from
+    1-14                  
+    1-15                 '
+    1-16                 vue
+    1-17                 '
+    1-18                 ⏎
+    1-19                   
+    1-20                 ⏎
+    1-21                   
+            2-27         const
+    1-25                  
+    1-40                 count
+            2-30          
+            2-31         =
+            2-32          
+            2-33         ref
+            2-34         (
+            2-35         1
+            2-36         )
+    1-38                 ⏎
+            2-38           
+            2-39         const
+    1-42                  
+    1-55                 double
+            2-42          
+            2-43         =
+            2-44          
+    1-49                 computed
+            2-46         (()
+    1-57                  
+            2-48         =>
+            2-49          
+    1-65                 count
+    1-64                 .
+            2-52         value
+    1-66                  
+    1-67                 *
+    1-68                  
+    1-69                 2
+            2-57         )
+    1-79                 ⏎
+    1-80                   
+    1-81                 </
+    1-82                 script
+    1-83                 >
+            2-63         ⏎
+    "
+  `)
+})
+
 function printDiff(info: KeyedTokensInfo, keys: string[]) {
   const text = info.tokens
     .map((t, i) => {
