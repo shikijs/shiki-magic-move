@@ -8,9 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@vue/shared':
-        specifier: ^3.4.19
-        version: 3.4.19
+      diff-match-patch-es:
+        specifier: ^0.1.0
+        version: 0.1.0
+      ohash:
+        specifier: ^1.1.3
+        version: 1.1.3
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^2.6.4
@@ -36,9 +39,6 @@ importers:
       bumpp:
         specifier: ^9.3.0
         version: 9.3.0
-      diff-match-patch-es:
-        specifier: ^0.1.0
-        version: 0.1.0
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -48,9 +48,6 @@ importers:
       lint-staged:
         specifier: ^15.2.2
         version: 15.2.2
-      ohash:
-        specifier: ^1.1.3
-        version: 1.1.3
       pnpm:
         specifier: ^8.15.4
         version: 8.15.4
@@ -2502,7 +2499,7 @@ packages:
 
   /diff-match-patch-es@0.1.0:
     resolution: {integrity: sha512-y+HzthUzXXodKmawgRo9gQivKhY/NGzkZURFMQWSWsdRpOpkjjmX9DfDWB/T4a3blVqKoXL6f8Spq1+dLd+csQ==}
-    dev: true
+    dev: false
 
   /diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
@@ -4048,7 +4045,6 @@ packages:
 
   /ohash@1.1.3:
     resolution: {integrity: sha512-zuHHiGTYTA1sYJ/wZN+t5HKZaH23i4yI1HMwbuXm24Nid7Dv0KcuRlKoNKS9UNfAVSBlnGLcuQrnOKWOZoEGaw==}
-    dev: true
 
   /once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
