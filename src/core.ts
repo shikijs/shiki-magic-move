@@ -212,7 +212,7 @@ export function syncTokenKeys(
 
   // Run the diff and generate matches parts
   // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
-  const matches = findTextMatches(from.code, to.code)
+  const matches = findTextMatches(from.code, to.code, options)
   const tokensFrom = splitBreakpoints
     ? splitTokens(from.tokens, matches.flatMap(m => m.from))
     : from.tokens
@@ -260,7 +260,11 @@ export function syncTokenKeys(
  * Find ranges of text matches between two strings
  * It uses `diff-match-patch` under the hood
  */
-export function findTextMatches(a: string, b: string, options: MagicMoveDifferOptions = {}): MatchedRanges[] {
+export function findTextMatches(
+  a: string,
+  b: string,
+  options: MagicMoveDifferOptions = {},
+): MatchedRanges[] {
   const delta = diff(a, b)
   const {
     diffCleanup = 'semantic',
