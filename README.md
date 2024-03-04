@@ -16,7 +16,7 @@ If you want to integrate it into your own project, you might want to read the so
 
 ## How it works
 
-[I](https://github.com/antfu) am writing a blog post explaining the details, stay tuned!
+Check [this blog post](https://antfu.me/posts/shiki-magic-move).
 
 ## Sponsors
 
