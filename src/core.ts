@@ -1,7 +1,7 @@
-import { diff, diffCleanupSemantic } from 'diff-match-patch-es'
+import { diff, diffCleanupEfficiency, diffCleanupMerge, diffCleanupSemantic, diffCleanupSemanticLossless } from 'diff-match-patch-es'
 import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
-import type { KeyedToken, KeyedTokensInfo, MatchedRanges } from './types'
+import type { KeyedToken, KeyedTokensInfo, MagicMoveDifferOptions, MatchedRanges } from './types'
 
 export * from './types'
 
@@ -9,15 +9,16 @@ type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A
 
 export function createMagicMoveMachine(
   codeToKeyedTokens: (code: string) => KeyedTokensInfo,
+  options?: MagicMoveDifferOptions,
 ) {
   const EMPTY = toKeyedTokens('', [])
   let previous = EMPTY
   let current = EMPTY
 
-  function commit(code: string, breakTokens?: boolean): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
+  function commit(code: string): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
     previous = current
     const newTokens = codeToKeyedTokens(code);
-    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, breakTokens))
+    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, options))
     return {
       current,
       previous,
@@ -203,13 +204,21 @@ function splitTokens(tokens: KeyedToken[], breakpoints: number[] | Set<number>):
 export function syncTokenKeys(
   from: KeyedTokensInfo,
   to: KeyedTokensInfo,
-  breakTokens = true,
+  options: MagicMoveDifferOptions = {},
 ): { from: KeyedTokensInfo, to: KeyedTokensInfo } {
+  const {
+    splitBreakpoints = true,
+  } = options
+
   // Run the diff and generate matches parts
   // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
   const matches = findTextMatches(from.code, to.code)
-  const tokensFrom = breakTokens ? splitTokens(from.tokens, matches.flatMap(m => m.from)) : from.tokens
-  const tokensTo = breakTokens ? splitTokens(to.tokens, matches.flatMap(m => m.to)) : to.tokens
+  const tokensFrom = splitBreakpoints
+    ? splitTokens(from.tokens, matches.flatMap(m => m.from))
+    : from.tokens
+  const tokensTo = splitBreakpoints
+    ? splitTokens(to.tokens, matches.flatMap(m => m.to))
+    : to.tokens
 
   matches.forEach((match) => {
     const tokensF = tokensFrom.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1])
@@ -251,9 +260,20 @@ export function syncTokenKeys(
  * Find ranges of text matches between two strings
  * It uses `diff-match-patch` under the hood
  */
-export function findTextMatches(a: string, b: string): MatchedRanges[] {
+export function findTextMatches(a: string, b: string, options: MagicMoveDifferOptions = {}): MatchedRanges[] {
   const delta = diff(a, b)
-  diffCleanupSemantic(delta)
+  const {
+    diffCleanup = 'semantic',
+  } = options
+
+  if (diffCleanup === 'semantic')
+    diffCleanupSemantic(delta)
+  else if (diffCleanup === 'efficiency')
+    diffCleanupEfficiency(delta)
+  else if (diffCleanup === 'merge')
+    diffCleanupMerge(delta)
+  else if (typeof diffCleanup === 'function')
+    diffCleanup(delta)
 
   let aContent = ''
   let bContent = ''

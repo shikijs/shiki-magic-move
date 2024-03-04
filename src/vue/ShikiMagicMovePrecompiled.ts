@@ -1,6 +1,6 @@
 import type { PropType } from 'vue'
 import { computed, defineComponent, h } from 'vue'
-import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
+import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { syncTokenKeys, toKeyedTokens } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
@@ -24,7 +24,7 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
       default: true,
     },
     options: {
-      type: Object as PropType<MagicMoveRenderOptions>,
+      type: Object as PropType<MagicMoveRenderOptions & MagicMoveDifferOptions>,
       default: () => ({}),
     },
   },
@@ -37,7 +37,11 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
 
     let previous = EMPTY
     const result = computed(() => {
-      const res = syncTokenKeys(previous, props.steps[Math.min(props.step, props.steps.length - 1)])
+      const res = syncTokenKeys(
+        previous,
+        props.steps[Math.min(props.step, props.steps.length - 1)],
+        props.options,
+      )
       previous = res.to
       return res
     })

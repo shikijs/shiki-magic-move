@@ -19,6 +19,7 @@ export const ShikiMagicMoveRenderer = /* #__PURE__ */ defineComponent({
     },
     previous: {
       type: Object as PropType<KeyedTokensInfo>,
+      required: false,
     },
     options: {
       type: Object as PropType<MagicMoveRenderOptions>,

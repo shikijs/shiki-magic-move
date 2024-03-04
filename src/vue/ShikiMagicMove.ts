@@ -2,7 +2,7 @@ import type { HighlighterCore } from 'shiki/core'
 import type { PropType } from 'vue'
 import { computed, defineComponent, h } from 'vue'
 import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
-import type { MagicMoveRenderOptions } from '../types'
+import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
@@ -25,7 +25,7 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
       required: true,
     },
     options: {
-      type: Object as PropType<MagicMoveRenderOptions>,
+      type: Object as PropType<MagicMoveRenderOptions & MagicMoveDifferOptions>,
       default: () => ({}),
     },
   },
@@ -34,11 +34,12 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
     'end',
   ],
   setup(props, { emit }) {
-    const machine = createMagicMoveMachine(code =>
-      codeToKeyedTokens(props.highlighter, code, {
+    const machine = createMagicMoveMachine(
+      code => codeToKeyedTokens(props.highlighter, code, {
         lang: props.lang,
         theme: props.theme,
       }),
+      props.options,
     )
 
     const result = computed(() => machine.commit(props.code))

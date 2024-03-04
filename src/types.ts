@@ -1,3 +1,4 @@
+import type { Diff } from 'diff-match-patch-es'
 import type { ThemedToken, TokensResult } from 'shiki/core'
 
 export type Range = [number, number]
@@ -68,4 +69,17 @@ export interface MagicMoveRenderOptions {
    * Apply animation to the container
    */
   animateContainer?: boolean
+}
+
+export interface MagicMoveDifferOptions {
+  /**
+   * Split the tokens into separate lines
+   *
+   * @default true
+   */
+  splitBreakpoints?: boolean
+  /**
+   * Algorithm to use to cleanup the diff
+   */
+  diffCleanup?: 'none' | 'semantic' | 'efficiency' | 'merge' | ((diffs: Diff[]) => void)
 }
