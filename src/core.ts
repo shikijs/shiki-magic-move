@@ -1,4 +1,4 @@
-import { diff, diffCleanupEfficiency, diffCleanupMerge, diffCleanupSemantic, diffCleanupSemanticLossless } from 'diff-match-patch-es'
+import { diff, diffCleanupEfficiency, diffCleanupMerge, diffCleanupSemantic } from 'diff-match-patch-es'
 import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
 import type { KeyedToken, KeyedTokensInfo, MagicMoveDifferOptions, MatchedRanges } from './types'
