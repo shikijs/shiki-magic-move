@@ -1,4 +1,4 @@
-import { diff } from 'diff-match-patch-es'
+import { diff, diffCleanupSemantic } from 'diff-match-patch-es'
 import type { HighlighterGeneric, ThemedToken } from 'shiki/core'
 import { hash as getHash } from 'ohash'
 import type { KeyedToken, KeyedTokensInfo, MatchedRanges } from './types'
@@ -10,14 +10,18 @@ type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A
 export function createMagicMoveMachine(
   codeToKeyedTokens: (code: string) => KeyedTokensInfo,
 ) {
-  const EMPTY = Object.freeze(toKeyedTokens('', []))
+  const EMPTY = toKeyedTokens('', [])
   let previous = EMPTY
   let current = EMPTY
-  function commit(code: string) {
+
+  function commit(code: string, breakTokens?: boolean): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
     previous = current
-    const newTokens = codeToKeyedTokens(code)
-    current = Object.freeze(syncTokenKeys(previous, newTokens))
-    return current
+    const newTokens = codeToKeyedTokens(code);
+    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, breakTokens))
+    return {
+      current,
+      previous,
+    }
   }
 
   return {
@@ -61,29 +65,31 @@ export function toKeyedTokens(
 ): KeyedTokensInfo {
   const hash = getHash(code)
   let lastOffset = 0
+  const keyed = splitWhitespaceTokens(tokens)
+    .flatMap((line): ThemedToken[] => {
+      const lastEl = line[line.length - 1]
+      if (!lastEl)
+        lastOffset += 1
+      else
+        lastOffset = lastEl.offset + lastEl.content.length
+      return [
+        ...line,
+        {
+          content: '\n',
+          offset: lastOffset,
+        },
+      ]
+    })
+    .map((token, idx) => {
+      const t = token as KeyedToken
+      t.key = `${hash}-${idx}`
+      return t
+    })
+
   return {
     code,
     hash,
-    tokens: splitWhitespaceTokens(tokens)
-      .flatMap((line): ThemedToken[] => {
-        const lastEl = line[line.length - 1]
-        if (!lastEl)
-          lastOffset += 1
-        else
-          lastOffset = lastEl.offset + lastEl.content.length
-        return [
-          ...line,
-          {
-            content: '\n',
-            offset: lastOffset,
-          },
-        ]
-      })
-      .map((token, idx) => {
-        const t = token as KeyedToken
-        t.key = `${hash}-${idx}`
-        return t
-      }),
+    tokens: keyed,
   }
 }
 
@@ -122,19 +128,92 @@ function splitWhitespaceTokens(tokens: ThemedToken[][]) {
 }
 
 /**
+ * Split a token into multiple tokens by given offsets.
+ *
+ * The offsets are relative to the token, and should be sorted.
+ */
+function splitToken(
+  token: KeyedToken,
+  offsets: number[],
+): KeyedToken[] {
+  let lastOffset = 0
+  const key = token.key
+  let index = 0
+  const tokens: KeyedToken[] = []
+
+  function getKey() {
+    if (index === 0) {
+      index++
+      return key
+    }
+    return `${key}-${index++}`
+  }
+
+  for (const offset of offsets) {
+    if (offset > lastOffset) {
+      tokens.push({
+        ...token,
+        content: token.content.slice(lastOffset, offset),
+        offset: token.offset + lastOffset,
+        key: getKey(),
+      })
+    }
+    lastOffset = offset
+  }
+
+  if (lastOffset < token.content.length) {
+    tokens.push({
+      ...token,
+      content: token.content.slice(lastOffset),
+      offset: token.offset + lastOffset,
+      key: getKey(),
+    })
+  }
+
+  return tokens
+}
+
+/**
+ * Split 2D tokens array by given breakpoints.
+ */
+function splitTokens(tokens: KeyedToken[], breakpoints: number[] | Set<number>): KeyedToken[] {
+  const sorted = Array.from(breakpoints instanceof Set ? breakpoints : new Set(breakpoints))
+    .sort((a, b) => a - b)
+
+  if (!sorted.length)
+    return tokens
+
+  return tokens.flatMap((token) => {
+    const breakpointsInToken = sorted
+      .filter(i => token.offset < i && i < token.offset + token.content.length)
+      .map(i => i - token.offset)
+      .sort((a, b) => a - b)
+
+    if (!breakpointsInToken.length)
+      return token
+
+    return splitToken(token, breakpointsInToken)
+  })
+}
+
+/**
  * Run diff on two sets of tokens,
  * and sync the keys from the first set to the second set if those tokens are matched
  */
 export function syncTokenKeys(
   from: KeyedTokensInfo,
   to: KeyedTokensInfo,
-) {
+  breakTokens = true,
+): { from: KeyedTokensInfo, to: KeyedTokensInfo } {
   // Run the diff and generate matches parts
   // In the matched parts, we override the keys with the same key so that the transition group can know they are the same element
   const matches = findTextMatches(from.code, to.code)
+  const tokensFrom = breakTokens ? splitTokens(from.tokens, matches.flatMap(m => m.from)) : from.tokens
+  const tokensTo = breakTokens ? splitTokens(to.tokens, matches.flatMap(m => m.to)) : to.tokens
+
   matches.forEach((match) => {
-    const tokensF = from.tokens.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1] && !isWhitespace(t.content))
-    const tokensT = to.tokens.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1] && !isWhitespace(t.content))
+    const tokensF = tokensFrom.filter(t => t.offset >= match.from[0] && t.offset + t.content.length <= match.from[1])
+    const tokensT = tokensTo.filter(t => t.offset >= match.to[0] && t.offset + t.content.length <= match.to[1])
 
     let idxF = 0
     let idxT = 0
@@ -162,7 +241,10 @@ export function syncTokenKeys(
     }
   })
 
-  return to
+  return {
+    from: tokensFrom.length === from.tokens.length ? from : { ...from, tokens: tokensFrom },
+    to: tokensTo.length === to.tokens.length ? to : { ...to, tokens: tokensTo },
+  }
 }
 
 /**
@@ -171,6 +253,7 @@ export function syncTokenKeys(
  */
 export function findTextMatches(a: string, b: string): MatchedRanges[] {
   const delta = diff(a, b)
+  diffCleanupSemantic(delta)
 
   let aContent = ''
   let bContent = ''
@@ -199,8 +282,4 @@ export function findTextMatches(a: string, b: string): MatchedRanges[] {
     throw new Error('Content mismatch')
 
   return matched
-}
-
-function isWhitespace(c: string) {
-  return c.match(/^\s*$/)
 }

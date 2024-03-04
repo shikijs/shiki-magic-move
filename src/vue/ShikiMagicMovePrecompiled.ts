@@ -18,6 +18,10 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
       type: Number,
       default: 0,
     },
+    animate: {
+      type: Boolean,
+      default: true,
+    },
     options: {
       type: Object as PropType<MagicMoveRenderOptions>,
       default: () => ({}),
@@ -33,6 +37,7 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
     return () => h(ShikiMagicMoveRenderer, {
       tokens: current.value,
       options: props.options,
+      animate: props.animate,
       onStart: () => emit('start'),
       onEnd: () => emit('end'),
     })

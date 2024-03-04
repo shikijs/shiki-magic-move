@@ -84,6 +84,7 @@
     "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^20.11.20",
     "@unocss/reset": "^0.58.5",
+    "@vueuse/core": "^10.9.0",
     "bumpp": "^9.3.0",
     "diff-match-patch-es": "^0.1.0",
     "eslint": "^8.57.0",

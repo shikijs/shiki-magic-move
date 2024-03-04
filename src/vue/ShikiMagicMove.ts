@@ -40,19 +40,21 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
         theme: props.theme,
       }),
     )
-    const tokens = computed(() => machine.commit(props.code))
+
+    const result = computed(() => machine.commit(props.code))
 
     return () => h(ShikiMagicMoveRenderer, {
-      tokens: tokens.value,
+      tokens: result.value.current,
       options: props.options,
+      previous: result.value.previous,
       onStart: () => emit('start'),
       onEnd: () => emit('end'),
       style: [
         {
-          color: tokens.value.fg,
-          backgroundColor: tokens.value.bg,
+          color: result.value.current.fg,
+          backgroundColor: result.value.current.bg,
         },
-        tokens.value.rootStyle,
+        result.value.current.rootStyle,
       ],
     })
   },

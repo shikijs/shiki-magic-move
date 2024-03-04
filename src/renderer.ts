@@ -60,7 +60,7 @@ export class MagicMoveRenderer {
     this.container.prepend(this.anchor)
   }
 
-  private updateDom(el: HTMLElement, token: KeyedToken) {
+  private updateTokenToEl(el: HTMLElement, token: KeyedToken) {
     if (token.content !== '\n') {
       el.textContent = token.content
       el.classList.add(`${CLASS_PREFIX}-item`)
@@ -96,8 +96,7 @@ export class MagicMoveRenderer {
     return promise
   }
 
-  // This function is intentionally not async
-  render(step: KeyedTokensInfo): Promise<void> {
+  setCssVariables() {
     // Update CSS variables
     this.container.style.setProperty('--smm-duration', `${this.options.duration}ms`)
     this.container.style.setProperty('--smm-delay-move', `${this.options.delayMove}`)
@@ -105,6 +104,43 @@ export class MagicMoveRenderer {
     this.container.style.setProperty('--smm-delay-enter', `${this.options.delayEnter}`)
     this.container.style.setProperty('--smm-delay-container', `${this.options.delayContainer}`)
     this.container.style.setProperty('--smm-easing', this.options.easing)
+  }
+
+  /**
+   * Replace tokens without animation
+   */
+  replace(step: KeyedTokensInfo): void {
+    const newDomMap = new Map<string, HTMLElement>()
+
+    const newChildren = step.tokens.map((token) => {
+      if (this.mapDom.has(token.key)) {
+        const el = this.mapDom.get(token.key)!
+        this.updateTokenToEl(el, token)
+        newDomMap.set(token.key, el)
+        this.mapDom.delete(token.key)
+        return el
+      }
+      else {
+        const el = document.createElement(token.content === '\n' ? 'br' : 'span')
+        this.updateTokenToEl(el, token)
+        newDomMap.set(token.key, el)
+        return el
+      }
+    })
+
+    this.container.replaceChildren(
+      this.anchor,
+      ...newChildren,
+    )
+    this.mapDom = newDomMap
+  }
+
+  /**
+   * Render tokens with animation
+   */
+  render(step: KeyedTokensInfo): Promise<void> {
+    // Note: This function is intentionally not async to keep the operations sync
+    this.setCssVariables()
 
     const newDomMap = new Map<string, HTMLElement>()
     const move = new Set<HTMLElement>()
@@ -131,7 +167,7 @@ export class MagicMoveRenderer {
     const newChildren = step.tokens.map((token) => {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
-        this.updateDom(el, token)
+        this.updateTokenToEl(el, token)
         move.add(el)
         newDomMap.set(token.key, el)
         this.mapDom.delete(token.key)
@@ -139,7 +175,7 @@ export class MagicMoveRenderer {
       }
       else {
         const el = document.createElement(token.content === '\n' ? 'br' : 'span')
-        this.updateDom(el, token)
+        this.updateTokenToEl(el, token)
         enter.add(el)
         newDomMap.set(token.key, el)
         return el
@@ -187,7 +223,7 @@ export class MagicMoveRenderer {
           el.classList.remove(CLASS_LEAVE_FROM)
           el.classList.remove(CLASS_LEAVE_ACTIVE)
           el.classList.remove(CLASS_ENTER_TO)
-          this.container.removeChild(el)
+          el.remove()
         }),
       )
     }

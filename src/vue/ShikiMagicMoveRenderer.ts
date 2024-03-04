@@ -9,9 +9,16 @@ import { MagicMoveRenderer as Renderer } from '../renderer'
 export const ShikiMagicMoveRenderer = /* #__PURE__ */ defineComponent({
   name: 'ShikiMagicMoveRenderer',
   props: {
+    animate: {
+      type: Boolean,
+      default: true,
+    },
     tokens: {
       type: Object as PropType<KeyedTokensInfo>,
       required: true,
+    },
+    previous: {
+      type: Object as PropType<KeyedTokensInfo>,
     },
     options: {
       type: Object as PropType<MagicMoveRenderOptions>,
@@ -36,11 +43,19 @@ export const ShikiMagicMoveRenderer = /* #__PURE__ */ defineComponent({
         () => props.tokens,
         async (tokens) => {
           Object.assign(renderer.options, props.options)
-          const process = renderer.render(tokens)
-          await nextTick()
-          emit('start')
-          await process
-          emit('end')
+          if (props.animate) {
+            if (props.previous)
+              renderer.replace(props.previous)
+            await nextTick()
+            const process = renderer.render(tokens)
+            await nextTick()
+            emit('start')
+            await process
+            emit('end')
+          }
+          else {
+            renderer.replace(tokens)
+          }
         },
         { immediate: true },
       )

@@ -4,14 +4,33 @@ import { getHighlighter } from 'shiki'
 import { bundledThemesInfo } from 'shiki/themes'
 import { bundledLanguagesInfo } from 'shiki/langs'
 import { ref, shallowRef, watch } from 'vue'
+import { toRefs, useLocalStorage } from '@vueuse/core'
 import { ShikiMagicMove } from '../../src/vue'
 import { vueAfter, vueBefore } from './fixture'
 
-const theme = ref('vitesse-dark')
-const lang = ref('vue')
+const defaultOptions = {
+  theme: 'vitesse-dark',
+  lang: 'vue',
+  autoCommit: true,
+  duration: 750,
+  code: vueBefore,
+  useDebugStyles: false,
+}
 
+const options = useLocalStorage('shiki-magic-move-options', defaultOptions, { mergeDefaults: true })
+
+const {
+  theme,
+  lang,
+  code,
+  duration,
+  autoCommit,
+  useDebugStyles,
+} = toRefs(options)
+
+const example = ref(vueBefore)
+const input = ref(code.value)
 const highlighter = ref<Highlighter>()
-
 const isAnimating = ref(false)
 
 const loadingPromise = shallowRef<Promise<void> | undefined>(
@@ -24,31 +43,33 @@ const loadingPromise = shallowRef<Promise<void> | undefined>(
   }),
 )
 
-const samplesCache = new Map<string, Promise<string | undefined>>()
+const samplesCache = new Map<string, Promise<string>>()
 
-function fetchSample(id: string) {
+async function fetchSample(id: string): Promise<string> {
   if (!samplesCache.has(id)) {
     samplesCache.set(id, fetch(`https://raw.githubusercontent.com/shikijs/textmate-grammars-themes/main/samples/${id}.sample`)
       .then(r => r.text())
       .catch((e) => {
         console.error(e)
-        return undefined
+        return `ERROR: ${e.message}`
       }))
   }
   return samplesCache.get(id)!
 }
 
-const example = ref(vueBefore)
-const code = ref(example)
-const input = ref(code.value)
-const autoCommit = ref(true)
-const duration = ref(500)
-
-function reset() {
+async function reset() {
   if (lang.value === 'vue')
     example.value = example.value === vueBefore ? vueAfter : vueBefore
+  else
+    example.value = await fetchSample(lang.value)
   input.value = example.value
   code.value = example.value
+}
+
+async function resetOptions() {
+  Object.assign(options.value, defaultOptions)
+  example.value = defaultOptions.code
+  input.value = defaultOptions.code
 }
 
 function commit() {
@@ -114,7 +135,7 @@ watch(
           @keydown.meta.enter.prevent="commit"
         />
       </div>
-      <div class="of-auto">
+      <div class="of-auto" :class="useDebugStyles ? 'magic-move-debug-style' : ''">
         <ShikiMagicMove
           v-if="highlighter && !loadingPromise"
           :highlighter="highlighter"
@@ -132,15 +153,11 @@ watch(
         >
           <span class="animate-pulse">Loading...</span>
         </div>
-        <!-- Events is not yet working well -->
-        <!-- <div v-if="isAnimating" class="py2 animate-pulse text-green">
-          Animating...
-        </div> -->
       </div>
     </div>
     <div class="flex-none flex flex-wrap gap-4 items-center">
       <button class="border border-gray:20 rounded px3 py1" @click="reset">
-        Reset Example
+        {{ lang === 'vue' ? 'Toggle Examples' : 'Reset Example' }}
       </button>
       <label>
         <input
@@ -161,8 +178,21 @@ watch(
         >
         {{ duration }}ms
       </label>
+      <label>
+        <input
+          v-model="useDebugStyles"
+          type="checkbox"
+        >
+        Debug Style
+      </label>
 
       <div class="flex-auto" />
+      <div v-if="isAnimating" class="animate-pulse text-green">
+        Animating...
+      </div>
+      <button class="border border-gray:20 rounded px3 py1" @click="resetOptions">
+        Reset Options
+      </button>
       <select
         v-model="theme"
         class="border border-gray:20 rounded px2 py1"
@@ -190,3 +220,15 @@ watch(
     </div>
   </div>
 </template>
+
+<style>
+.magic-move-debug-style .shiki-magic-move-move {
+  background: #8883;
+}
+.magic-move-debug-style .shiki-magic-move-enter-active {
+  background: rgba(92, 183, 47, 0.3);
+}
+.magic-move-debug-style .shiki-magic-move-leave-active {
+  background: rgba(183, 47, 47, 0.533);
+}
+</style>
