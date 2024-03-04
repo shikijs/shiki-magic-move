@@ -1,6 +1,7 @@
 import type { PropType } from 'vue'
 import { computed, defineComponent, h } from 'vue'
 import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
+import { syncTokenKeys, toKeyedTokens } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 /**
@@ -32,14 +33,29 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
     'end',
   ],
   setup(props, { emit }) {
-    const current = computed(() => props.steps[props.step])
+    const EMPTY = toKeyedTokens('', [])
+
+    let previous = EMPTY
+    const result = computed(() => {
+      const res = syncTokenKeys(previous, props.steps[Math.min(props.step, props.steps.length - 1)])
+      previous = res.to
+      return res
+    })
 
     return () => h(ShikiMagicMoveRenderer, {
-      tokens: current.value,
+      tokens: result.value.to,
+      previous: result.value.from,
       options: props.options,
       animate: props.animate,
       onStart: () => emit('start'),
       onEnd: () => emit('end'),
+      style: [
+        {
+          color: result.value.to.fg,
+          backgroundColor: result.value.to.bg,
+        },
+        result.value.to.rootStyle,
+      ],
     })
   },
 })
