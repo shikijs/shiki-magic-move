@@ -143,7 +143,7 @@ watch(
           :lang="lang"
           :theme="theme"
           :options="{ duration }"
-          class="font-mono p-4 border border-gray:20 shadow-xl rounded"
+          class="font-mono w-fit p-4 border border-gray:20 shadow-xl rounded"
           @start="isAnimating = true"
           @end="isAnimating = false"
         />
