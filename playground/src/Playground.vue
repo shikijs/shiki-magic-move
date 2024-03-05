@@ -15,6 +15,7 @@ const defaultOptions = {
   duration: 750,
   code: vueBefore,
   useDebugStyles: false,
+  stagger: 3,
 }
 
 const options = useLocalStorage('shiki-magic-move-options', defaultOptions, { mergeDefaults: true })
@@ -26,6 +27,7 @@ const {
   duration,
   autoCommit,
   useDebugStyles,
+  stagger,
 } = toRefs(options)
 
 const example = ref(vueBefore)
@@ -128,22 +130,101 @@ watch(
       </div>
     </div>
     <div class="grid md:grid-cols-2 gap-4 flex-auto of-hidden">
-      <div class="of-hidden">
+      <div class="of-hidden flex flex-col gap-4">
+        <div class="flex-none flex flex-wrap gap-4 items-center mb--2px">
+          <button class="border border-gray:20 rounded px3 py1" @click="reset">
+            {{ lang === 'vue' ? 'Toggle Examples' : 'Reset Example' }}
+          </button>
+          <label>
+            <input
+              v-model="autoCommit"
+              type="checkbox"
+            >
+            Auto Commit
+          </label>
+          <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
+            Commit Changes
+          </button>
+        </div>
         <textarea
           v-model="input"
           class="font-mono w-full h-full flex-auto p-4 border border-gray:20 rounded bg-transparent"
           @keydown.meta.enter.prevent="commit"
         />
+        <div class="flex-none flex flex-wrap gap-6 items-center">
+          <label class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              Duration
+              <span class="op50 text-sm">{{ duration }}ms</span>
+            </div>
+            <input
+              v-model="duration"
+              type="range" min="100" max="20000"
+              class="w-50"
+            >
+          </label>
+          <label class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              Stagger
+              <span class="op50 text-sm">{{ stagger }}ms</span>
+            </div>
+            <input
+              v-model="stagger"
+              type="range" min="0" max="20"
+              class="w-50"
+            >
+          </label>
+          <label>
+            <input
+              v-model="useDebugStyles"
+              type="checkbox"
+            >
+            Style for debugging
+          </label>
+          <div class="flex-auto" />
+          <button class="border border-gray:20 rounded px3 py1" @click="resetOptions">
+            Reset Options
+          </button>
+        </div>
       </div>
-      <div class="of-auto" :class="useDebugStyles ? 'magic-move-debug-style' : ''">
+      <div class="of-auto flex flex-col gap-4" :class="useDebugStyles ? 'magic-move-debug-style' : ''">
+        <div class="flex-none flex flex-wrap gap-4 items-center">
+          <select
+            v-model="theme"
+            class="border border-gray:20 rounded px2 py1"
+          >
+            <option
+              v-for="t of bundledThemesInfo"
+              :key="t.id"
+              :value="t.id"
+            >
+              {{ t.displayName }}
+            </option>
+          </select>
+          <select
+            v-model="lang"
+            class="border border-gray:20 rounded px2 py1"
+          >
+            <option
+              v-for="l of bundledLanguagesInfo"
+              :key="l.id"
+              :value="l.id"
+            >
+              {{ l.name }}
+            </option>
+          </select>
+          <div v-if="isAnimating" class="animate-pulse text-green">
+            Animating...
+          </div>
+        </div>
         <ShikiMagicMove
           v-if="highlighter && !loadingPromise"
           :highlighter="highlighter"
           :code="code"
           :lang="lang"
           :theme="theme"
-          :options="{ duration }"
-          class="font-mono w-fit p-4 border border-gray:20 shadow-xl rounded"
+          :options="{ duration, stagger }"
+          class="font-mono w-fit p-4 border border-gray:20 shadow-xl rounded of-hidden"
           @start="isAnimating = true"
           @end="isAnimating = false"
         />
@@ -154,69 +235,6 @@ watch(
           <span class="animate-pulse">Loading...</span>
         </div>
       </div>
-    </div>
-    <div class="flex-none flex flex-wrap gap-4 items-center">
-      <button class="border border-gray:20 rounded px3 py1" @click="reset">
-        {{ lang === 'vue' ? 'Toggle Examples' : 'Reset Example' }}
-      </button>
-      <label>
-        <input
-          v-model="autoCommit"
-          type="checkbox"
-        >
-        Auto Commit
-      </label>
-      <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
-        Commit Changes
-      </button>
-      <label class="flex gap-2">
-        Duration
-        <input
-          v-model="duration"
-          type="range" min="100" max="5000"
-          class="border border-gray:20 rounded px2 py1"
-        >
-        {{ duration }}ms
-      </label>
-      <label>
-        <input
-          v-model="useDebugStyles"
-          type="checkbox"
-        >
-        Debug Style
-      </label>
-
-      <div class="flex-auto" />
-      <div v-if="isAnimating" class="animate-pulse text-green">
-        Animating...
-      </div>
-      <button class="border border-gray:20 rounded px3 py1" @click="resetOptions">
-        Reset Options
-      </button>
-      <select
-        v-model="theme"
-        class="border border-gray:20 rounded px2 py1"
-      >
-        <option
-          v-for="t of bundledThemesInfo"
-          :key="t.id"
-          :value="t.id"
-        >
-          {{ t.displayName }}
-        </option>
-      </select>
-      <select
-        v-model="lang"
-        class="border border-gray:20 rounded px2 py1"
-      >
-        <option
-          v-for="l of bundledLanguagesInfo"
-          :key="l.id"
-          :value="l.id"
-        >
-          {{ l.name }}
-        </option>
-      </select>
     </div>
   </div>
 </template>

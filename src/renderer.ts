@@ -21,6 +21,7 @@ export const defaultOptions: Required<MagicMoveRenderOptions> = {
   delayLeave: 0.1,
   delayEnter: 0.7,
   delayContainer: 0.4,
+  stagger: 0,
   easing: 'ease',
   animateContainer: true,
 }
@@ -104,6 +105,7 @@ export class MagicMoveRenderer {
     this.container.style.setProperty('--smm-delay-enter', `${this.options.delayEnter}`)
     this.container.style.setProperty('--smm-delay-container', `${this.options.delayContainer}`)
     this.container.style.setProperty('--smm-easing', this.options.easing)
+    this.container.style.setProperty('--smm-stagger', '0')
   }
 
   /**
@@ -143,9 +145,9 @@ export class MagicMoveRenderer {
     this.setCssVariables()
 
     const newDomMap = new Map<string, HTMLElement>()
-    const move = new Set<HTMLElement>()
-    const enter = new Set<HTMLElement>()
-    const leave = new Set<HTMLElement>()
+    const move: HTMLElement[] = []
+    const enter: HTMLElement[] = []
+    const leave: HTMLElement[] = []
     const promises: PromiseWithResolve[] = []
 
     this.previousPromises.forEach(p => p.resolve())
@@ -168,7 +170,7 @@ export class MagicMoveRenderer {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
         this.updateTokenToEl(el, token)
-        move.add(el)
+        move.push(el)
         newDomMap.set(token.key, el)
         this.mapDom.delete(token.key)
         return el
@@ -176,7 +178,7 @@ export class MagicMoveRenderer {
       else {
         const el = document.createElement(token.content === '\n' ? 'br' : 'span')
         this.updateTokenToEl(el, token)
-        enter.add(el)
+        enter.push(el)
         newDomMap.set(token.key, el)
         return el
       }
@@ -185,7 +187,7 @@ export class MagicMoveRenderer {
     for (const [_, el] of this.mapDom) {
       if (el.tagName === 'BR')
         continue
-      leave.add(el)
+      leave.push(el)
     }
 
     for (const el of leave)
@@ -204,11 +206,16 @@ export class MagicMoveRenderer {
     const postReflow: (() => void)[] = []
 
     // Lock leave elements to their position with absolute positioning
-    for (const el of leave) {
+    leave.forEach((el, idx) => {
       el.style.position = 'absolute'
       const pos = position.get(el)!
       el.style.top = `${pos.y / scale}px`
       el.style.left = `${pos.x / scale}px`
+
+      if (this.options.stagger)
+        el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
+      else
+        el.style.removeProperty('--smm-stagger')
 
       el.classList.add(CLASS_LEAVE_FROM)
       el.classList.add(CLASS_LEAVE_ACTIVE)
@@ -226,13 +233,18 @@ export class MagicMoveRenderer {
           el.remove()
         }),
       )
-    }
+    })
 
     // Apply enter animation
     if (!this.isFirstRender) {
-      for (const el of enter) {
+      enter.forEach((el, idx) => {
         el.classList.add(CLASS_ENTER_FROM)
         el.classList.add(CLASS_ENTER_ACTIVE)
+
+        if (this.options.stagger)
+          el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
+        else
+          el.style.removeProperty('--smm-stagger')
 
         postReflow.push(() => {
           el.classList.remove(CLASS_ENTER_FROM)
@@ -246,14 +258,14 @@ export class MagicMoveRenderer {
             el.classList.remove(CLASS_ENTER_TO)
           }),
         )
-      }
+      })
     }
 
     // We recalculate the anchor position because the container might be moved
     anchorRect = this.anchor.getBoundingClientRect()
     // Set the position of the move elements to the old position
     // Set the transition duration to 0ms to make it immediate
-    for (const el of move) {
+    move.forEach((el, idx) => {
       const newRect = el.getBoundingClientRect()
       const newPos = { x: newRect.x - anchorRect.x, y: newRect.y - anchorRect.y }
       const oldPos = position.get(el)!
@@ -261,6 +273,11 @@ export class MagicMoveRenderer {
       const dx = (oldPos.x - newPos.x) / scale
       const dy = (oldPos.y - newPos.y) / scale
       el.style.transform = `translate(${dx}px, ${dy}px)`
+
+      if (this.options.stagger)
+        el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
+      else
+        el.style.removeProperty('--smm-stagger')
 
       postReflow.push(() => {
         // Remove transform overrides, so it will start animating back to the new position
@@ -273,7 +290,7 @@ export class MagicMoveRenderer {
           el.classList.remove(CLASS_MOVE)
         }),
       )
-    }
+    })
 
     // Animate the container size
     if (this.options.animateContainer && !this.isFirstRender) {
