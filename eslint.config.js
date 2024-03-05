@@ -6,6 +6,7 @@ export default antfu(
     ignores: [
       // eslint ignore globs here
     ],
+    react: true,
   },
   {
     rules: {

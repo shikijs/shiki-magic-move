@@ -4,6 +4,7 @@ export default defineBuildConfig({
   entries: [
     'src/index',
     'src/vue',
+    'src/react',
     'src/core',
     'src/types',
     'src/renderer',

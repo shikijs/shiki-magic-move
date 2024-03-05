@@ -16,6 +16,9 @@ export function createMagicMoveMachine(
   let current = EMPTY
 
   function commit(code: string): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
+    if (code === current.code)
+      return { current, previous }
+
     previous = current
     const newTokens = codeToKeyedTokens(code);
     ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, options))
