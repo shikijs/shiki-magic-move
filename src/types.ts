@@ -69,6 +69,13 @@ export interface MagicMoveRenderOptions {
    * Apply animation to the container
    */
   animateContainer?: boolean
+
+  /**
+   * Stagger the animation of the tokens, in milliseconds
+   *
+   * @default 0
+   */
+  stagger?: number
 }
 
 export interface MagicMoveDifferOptions {
