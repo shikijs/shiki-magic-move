@@ -53,13 +53,6 @@ export const ShikiMagicMovePrecompiled = /* #__PURE__ */ defineComponent({
       animate: props.animate,
       onStart: () => emit('start'),
       onEnd: () => emit('end'),
-      style: [
-        {
-          color: result.value.to.fg,
-          backgroundColor: result.value.to.bg,
-        },
-        result.value.to.rootStyle,
-      ],
     })
   },
 })

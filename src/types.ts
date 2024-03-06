@@ -71,6 +71,13 @@ export interface MagicMoveRenderOptions {
   animateContainer?: boolean
 
   /**
+   * Apply styles (color and background) to the container
+   *
+   * @default true
+   */
+  containerStyle?: boolean
+
+  /**
    * Stagger the animation of the tokens, in milliseconds
    *
    * @default 0

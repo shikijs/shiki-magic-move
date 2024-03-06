@@ -8,7 +8,8 @@ const CLASS_ENTER_FROM = `${CLASS_PREFIX}-enter-from`
 const CLASS_ENTER_TO = `${CLASS_PREFIX}-enter-to`
 const CLASS_ENTER_ACTIVE = `${CLASS_PREFIX}-enter-active`
 const CLASS_MOVE = `${CLASS_PREFIX}-move`
-const CLASS_CONTAINER = `${CLASS_PREFIX}-container-resize`
+const CLASS_CONTAINER_RESIZE = `${CLASS_PREFIX}-container-resize`
+const CLASS_CONTAINER_RESTYLE = `${CLASS_PREFIX}-container-restyle`
 
 interface PromiseWithResolve<T = void> extends Promise<T> {
   resolve: (value: T) => void
@@ -24,6 +25,7 @@ export const defaultOptions: Required<MagicMoveRenderOptions> = {
   stagger: 0,
   easing: 'ease',
   animateContainer: true,
+  containerStyle: true,
 }
 
 export class MagicMoveRenderer {
@@ -61,18 +63,42 @@ export class MagicMoveRenderer {
     this.container.prepend(this.anchor)
   }
 
-  private updateTokenToEl(el: HTMLElement, token: KeyedToken, applyStyle = true) {
+  private applyElementContent(el: HTMLElement, token: KeyedToken) {
     if (token.content !== '\n') {
       el.textContent = token.content
       el.classList.add(`${CLASS_PREFIX}-item`)
     }
-    if (applyStyle) {
-      if (token.htmlStyle)
-        el.setAttribute('style', token.htmlStyle)
-      if (token.color)
-        el.style.color = token.color
-      if (token.bgColor)
-        el.style.backgroundColor = token.bgColor
+  }
+
+  private applyElementStyle(el: HTMLElement, token: KeyedToken) {
+    if (token.htmlStyle)
+      el.setAttribute('style', token.htmlStyle)
+    if (token.color)
+      el.style.color = token.color
+    if (token.bgColor)
+      el.style.backgroundColor = token.bgColor
+  }
+
+  private applyElement(el: HTMLElement, token: KeyedToken) {
+    this.applyElementContent(el, token)
+    this.applyElementStyle(el, token)
+  }
+
+  private applyContainerStyle(step: KeyedTokensInfo) {
+    if (!this.options.containerStyle)
+      return
+
+    if (step.bg)
+      this.container.style.backgroundColor = step.bg
+    if (step.fg)
+      this.container.style.color = step.fg
+    if (step.rootStyle) {
+      const items = step.rootStyle.split(';')
+      for (const item of items) {
+        const [key, value] = item.split(':')
+        if (key && value)
+          this.container.style.setProperty(key.trim(), value.trim())
+      }
     }
   }
 
@@ -119,14 +145,14 @@ export class MagicMoveRenderer {
     const newChildren = step.tokens.map((token) => {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
-        this.updateTokenToEl(el, token)
+        this.applyElement(el, token)
         newDomMap.set(token.key, el)
         this.mapDom.delete(token.key)
         return el
       }
       else {
         const el = document.createElement(token.content === '\n' ? 'br' : 'span')
-        this.updateTokenToEl(el, token)
+        this.applyElement(el, token)
         newDomMap.set(token.key, el)
         return el
       }
@@ -136,14 +162,17 @@ export class MagicMoveRenderer {
       this.anchor,
       ...newChildren,
     )
+
+    this.applyContainerStyle(step)
+
     this.mapDom = newDomMap
   }
 
+  // Note: This function is intentionally not async to keep the operations sync
   /**
    * Render tokens with animation
    */
   render(step: KeyedTokensInfo): Promise<void> {
-    // Note: This function is intentionally not async to keep the operations sync
     this.setCssVariables()
 
     const newDomMap = new Map<string, HTMLElement>()
@@ -174,10 +203,10 @@ export class MagicMoveRenderer {
     const newChildren = step.tokens.map((token) => {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
-        this.updateTokenToEl(el, token, false)
+        this.applyElementContent(el, token)
         postReflow.push(() => {
           // Update color and style after reflow
-          this.updateTokenToEl(el, token)
+          this.applyElementStyle(el, token)
         })
         move.push(el)
         newDomMap.set(token.key, el)
@@ -186,7 +215,7 @@ export class MagicMoveRenderer {
       }
       else {
         const el = document.createElement(token.content === '\n' ? 'br' : 'span')
-        this.updateTokenToEl(el, token)
+        this.applyElement(el, token)
         enter.push(el)
         newDomMap.set(token.key, el)
         return el
@@ -307,7 +336,7 @@ export class MagicMoveRenderer {
         this.container.style.width = `${containerRect.width / scale}px`
 
         postReflow.unshift(() => {
-          this.container.classList.add(CLASS_CONTAINER)
+          this.container.classList.add(CLASS_CONTAINER_RESIZE)
           this.container.style.transitionDuration = this.container.style.transitionDelay = ''
           this.container.style.height = `${newRect.height / scale}px`
           this.container.style.width = `${newRect.width / scale}px`
@@ -315,8 +344,26 @@ export class MagicMoveRenderer {
 
         promises.push(
           this.registerTransitionEnd(this.container, () => {
-            this.container.classList.remove(CLASS_CONTAINER)
+            this.container.classList.remove(CLASS_CONTAINER_RESIZE)
             this.container.style.height = this.container.style.width = ''
+          }),
+        )
+      }
+    }
+
+    if (this.options.containerStyle) {
+      if (this.isFirstRender) {
+        this.applyContainerStyle(step)
+      }
+      else {
+        postReflow.push(() => {
+          this.container.classList.add(CLASS_CONTAINER_RESTYLE)
+          this.applyContainerStyle(step)
+        })
+
+        promises.push(
+          this.registerTransitionEnd(this.container, () => {
+            this.container.classList.remove(CLASS_CONTAINER_RESTYLE)
           }),
         )
       }
