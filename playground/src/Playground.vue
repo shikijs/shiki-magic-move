@@ -6,9 +6,9 @@ import { bundledLanguagesInfo } from 'shiki/langs'
 import { ref, shallowRef, watch, watchEffect } from 'vue'
 import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
-import type { RendererFactoryOptions, RendererFactoryResult, RendererUpdatePayload } from './renderer/types'
 import { createRendererVue } from './renderer/vue'
 import { createRendererReact } from './renderer/react'
+import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 
 const defaultOptions = {
   theme: 'vitesse-dark',
@@ -18,7 +18,7 @@ const defaultOptions = {
   code: vueBefore,
   useDebugStyles: false,
   stagger: 3,
-  rendererType: 'vue' as 'vue' | 'react',
+  rendererType: 'vue' as RendererType,
 }
 
 const options = useLocalStorage('shiki-magic-move-options', defaultOptions, { mergeDefaults: true })
@@ -281,14 +281,10 @@ watch(
             v-model="rendererType"
             class="border border-gray:20 rounded px2 py1 ml--2"
           >
-            <option
-              value="vue"
-            >
+            <option value="vue">
               Vue
             </option>
-            <option
-              value="react"
-            >
+            <option value="react">
               React
             </option>
           </select>
@@ -297,23 +293,6 @@ watch(
           </div>
         </div>
         <div ref="rendererContainer" />
-        <!-- <ShikiMagicMove
-          v-if="highlighter && !loadingPromise"
-          :highlighter="highlighter"
-          :code="code"
-          :lang="lang"
-          :theme="theme"
-          :options="{ duration, stagger }"
-          class="font-mono w-fit p-4 border border-gray:20 shadow-xl rounded of-hidden"
-          @start="isAnimating = true"
-          @end="isAnimating = false"
-        />
-        <div
-          v-else
-          class="font-mono w-full h-full p-4 border border-gray:20 shadow-xl rounded"
-        >
-          <span class="animate-pulse">Loading...</span>
-        </div> -->
       </div>
     </div>
   </div>

@@ -1,15 +1,20 @@
 export const vueBefore = `<script>
-export default {
-  data() {
-    return {
-      greeting: 'Hello World!'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  data: () => ({
+    count: 1
+  }),
+  computed: {
+    double() {
+      return this.count * 2
     }
-  }
-}
+  },
+})
 </script>
 
 <template>
-  <p class="greeting">{{ greeting }}</p>
+  <p class="greeting">{{ count }} * 2 = {{ doubled }}</p>
 </template>
 
 <style>
@@ -20,12 +25,14 @@ export default {
 </style>`
 
 export const vueAfter = `<script setup>
-import { ref } from 'vue'
-const greeting = ref('Hello World!')
+import { ref, computed } from 'vue'
+
+const count = ref(1)
+const double = computed(() => count.value * 2)
 </script>
 
 <template>
-  <p class="greeting">{{ greeting.toUpperCase() }}</p>
+  <p class="greeting">{{ count }} = {{ doubled / 2 }}</p>
 </template>
 
 <style>
