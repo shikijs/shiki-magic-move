@@ -78,15 +78,11 @@
   },
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "shiki": "^1.1.6",
     "vue": "^3.4.0"
   },
   "peerDependenciesMeta": {
     "react": {
-      "optional": true
-    },
-    "react-dom": {
       "optional": true
     },
     "shiki": {
