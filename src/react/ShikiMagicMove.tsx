@@ -34,7 +34,10 @@ export function ShikiMagicMove(
       }),
       options,
     ),
-    [highlighter, lang, options, theme],
+    // FIXME: we should not create new machines
+    // Try to correct the dependency array if something goes wrong.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   )
 
   const result = React.useMemo(() => machine.commit(code), [code, machine])
