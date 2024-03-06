@@ -8,6 +8,7 @@ import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
 import type { RendererFactoryOptions, RendererFactoryResult, RendererUpdatePayload } from './renderer/types'
 import { createRendererVue } from './renderer/vue'
+import { createRendererReact } from './renderer/react'
 
 const defaultOptions = {
   theme: 'vitesse-dark',
@@ -60,6 +61,18 @@ const rendererOptions: RendererFactoryOptions = {
   },
 }
 
+watch(
+  rendererType,
+  () => {
+    if (renderer) {
+      renderer?.dispose()
+      renderer = undefined as any
+    }
+    rendererUpdate()
+  },
+  { flush: 'sync' },
+)
+
 function rendererUpdate() {
   if (!rendererContainer.value || !highlighter.value || loadingPromise.value)
     return
@@ -79,7 +92,7 @@ function rendererUpdate() {
   if (!renderer) {
     renderer = rendererType.value === 'vue'
       ? createRendererVue(rendererOptions)
-      : undefined!
+      : createRendererReact(rendererOptions)
     renderer.mount(rendererContainer.value, payload)
   }
   else {
@@ -261,6 +274,22 @@ watch(
               :value="l.id"
             >
               {{ l.name }}
+            </option>
+          </select>
+          Renderer:
+          <select
+            v-model="rendererType"
+            class="border border-gray:20 rounded px2 py1 ml--2"
+          >
+            <option
+              value="vue"
+            >
+              Vue
+            </option>
+            <option
+              value="react"
+            >
+              React
             </option>
           </select>
           <div v-if="isAnimating" class="animate-pulse text-green">

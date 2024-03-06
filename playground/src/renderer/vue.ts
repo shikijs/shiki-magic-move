@@ -20,6 +20,8 @@ export const createRendererVue: RendererFactory = (options): RendererFactoryResu
         render: () => h(ShikiMagicMove, props as any),
       })
       app.mount(element)
+      // eslint-disable-next-line no-console
+      console.log('Vue renderer mounted')
     },
 
     update: (payload) => {
