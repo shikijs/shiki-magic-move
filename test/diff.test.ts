@@ -19,6 +19,16 @@ it('diff1', async () => {
   let tokens2 = codeToKeyedTokens(highlighter, code2, { lang, theme })
   let tokens3 = codeToKeyedTokens(highlighter, code3, { lang, theme })
 
+  const hashes = [tokens1.hash, tokens2.hash, tokens3.hash]
+
+  expect.soft(hashes).toMatchInlineSnapshot(`
+    [
+      "hD0HhOdtAP",
+      "L1LlseyEQ5",
+      "oCzzhGXmbP",
+    ]
+  `)
+
   normalizeKeys(tokens1, '1')
   normalizeKeys(tokens2, '2')
   normalizeKeys(tokens3, '3')

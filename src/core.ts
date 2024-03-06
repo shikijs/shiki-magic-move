@@ -53,6 +53,8 @@ export function codeToKeyedTokens<
     ...toKeyedTokens(
       code,
       result.tokens,
+      // We put the lang and theme to participate in the hash calculation because they can affect the tokenization
+      JSON.stringify([options.lang, 'themes' in options ? options.themes : options.theme]),
     ),
     bg: result.bg,
     fg: result.fg,
@@ -63,8 +65,9 @@ export function codeToKeyedTokens<
 export function toKeyedTokens(
   code: string,
   tokens: ThemedToken[][],
+  salt = '',
 ): KeyedTokensInfo {
-  const hash = getHash(code)
+  const hash = getHash(code + salt)
   let lastOffset = 0
   const keyed = splitWhitespaceTokens(tokens)
     .flatMap((line): ThemedToken[] => {
