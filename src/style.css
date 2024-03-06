@@ -17,7 +17,8 @@
   transition: all var(--smm-duration, 0.5s) var(--smm-easing, 'ease');
 }
 
-.shiki-magic-move-container-resize {
+.shiki-magic-move-container-resize,
+.shiki-magic-move-container-restyle {
   transition: all var(--smm-duration, 0.5s) var(--smm-easing, 'ease');
   transition-delay: calc(var(--smm-duration, 0.5s) * var(--smm-delay-container, 1));
 }

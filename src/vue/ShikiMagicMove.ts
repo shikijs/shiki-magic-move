@@ -50,13 +50,6 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
       previous: result.value.previous,
       onStart: () => emit('start'),
       onEnd: () => emit('end'),
-      style: [
-        {
-          color: result.value.current.fg,
-          backgroundColor: result.value.current.bg,
-        },
-        result.value.current.rootStyle,
-      ],
     })
   },
 })
