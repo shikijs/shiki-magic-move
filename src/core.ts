@@ -9,16 +9,19 @@ type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A
 
 export function createMagicMoveMachine(
   codeToKeyedTokens: (code: string) => KeyedTokensInfo,
-  options?: MagicMoveDifferOptions,
+  options: MagicMoveDifferOptions = {},
 ) {
   const EMPTY = toKeyedTokens('', [])
   let previous = EMPTY
   let current = EMPTY
 
-  function commit(code: string): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
+  function commit(code: string, override: MagicMoveDifferOptions = {}): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
     previous = current
     const newTokens = codeToKeyedTokens(code);
-    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, options))
+    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, {
+      ...options,
+      ...override,
+    }))
     return {
       current,
       previous,

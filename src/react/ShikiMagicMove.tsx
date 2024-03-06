@@ -1,60 +1,45 @@
 import * as React from 'react'
 import type { HighlighterCore } from 'shiki/core'
 import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
-import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
+import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
-import { createCSSPropertiesFromString } from './utils'
 
-export function ShikiMagicMove(
-  {
-    highlighter,
-    lang,
-    theme,
-    code,
-    options,
-    onStart,
-    onEnd,
-    className,
-  }: {
-    highlighter: HighlighterCore
-    lang: string
-    theme: string
-    code: string
-    options?: MagicMoveRenderOptions & MagicMoveDifferOptions
-    onStart?: () => void
-    onEnd?: () => void
-    className?: string
-  },
-) {
-  const machine = React.useMemo(
-    () => createMagicMoveMachine(
-      code => codeToKeyedTokens(highlighter, code, {
-        lang,
-        theme,
-      }),
-      options,
-    ),
-    // FIXME: we should not create new machines
-    // Try to correct the dependency array if something goes wrong.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+export interface ShikiMagicMoveProps {
+  highlighter: HighlighterCore
+  lang: string
+  theme: string
+  code: string
+  options?: MagicMoveRenderOptions & MagicMoveDifferOptions
+  onStart?: () => void
+  onEnd?: () => void
+  className?: string
+}
+
+export function ShikiMagicMove(props: ShikiMagicMoveProps) {
+  const codeToTokens = React.useRef<(code: string) => KeyedTokensInfo>()
+  codeToTokens.current = code => codeToKeyedTokens(props.highlighter, code, {
+    lang: props.lang,
+    theme: props.theme,
+  })
+
+  const machine = React.useRef<ReturnType<typeof createMagicMoveMachine>>()
+  machine.current = machine.current || createMagicMoveMachine(
+    code => codeToTokens.current!(code),
   )
 
-  const result = React.useMemo(() => machine.commit(code), [code, machine])
+  const result = React.useMemo(
+    () => machine.current!.commit(props.code, props.options),
+    [props.code, props.options],
+  )
 
   return (
     <ShikiMagicMoveRenderer
       tokens={result.current}
-      options={options}
+      options={props.options}
       previous={result.previous}
-      onStart={onStart}
-      onEnd={onEnd}
-      className={className}
-      style={{
-        ...createCSSPropertiesFromString(result.current.rootStyle),
-        color: result.current.fg,
-        backgroundColor: result.current.bg,
-      }}
+      onStart={props.onStart}
+      onEnd={props.onEnd}
+      className={props.className}
     />
   )
 }

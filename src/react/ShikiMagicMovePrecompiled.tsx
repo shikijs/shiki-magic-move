@@ -2,7 +2,17 @@ import * as React from 'react'
 import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { syncTokenKeys, toKeyedTokens } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
-import { createCSSPropertiesFromString } from './utils'
+
+export interface ShikiMagicMovePrecompiledProps {
+  steps: KeyedTokensInfo[]
+  step?: number
+  animate?: boolean
+  options?: MagicMoveRenderOptions & MagicMoveDifferOptions
+  onStart?: () => void
+  onEnd?: () => void
+}
+
+const EMPTY = /* @__PURE__ */ toKeyedTokens('', [])
 
 /**
  * Component to render a compiled magic move step,
@@ -16,18 +26,10 @@ export function ShikiMagicMovePrecompiled(
     options,
     onStart,
     onEnd,
-  }: {
-    steps: KeyedTokensInfo[]
-    step?: number
-    animate?: boolean
-    options?: MagicMoveRenderOptions & MagicMoveDifferOptions
-    onStart?: () => void
-    onEnd?: () => void
-  },
+  }: ShikiMagicMovePrecompiledProps,
 ) {
-  const EMPTY = toKeyedTokens('', [])
-
   const [previous, setPrevious] = React.useState(EMPTY)
+
   const result = React.useMemo(() => {
     const res = syncTokenKeys(
       previous,
@@ -46,11 +48,6 @@ export function ShikiMagicMovePrecompiled(
       animate={animate}
       onStart={onStart}
       onEnd={onEnd}
-      style={{
-        ...createCSSPropertiesFromString(result.to.rootStyle),
-        color: result.to.fg,
-        backgroundColor: result.to.bg,
-      }}
     />
   )
 }

@@ -3,6 +3,17 @@ import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
 import { MagicMoveRenderer as Renderer } from '../renderer'
 import { createCSSPropertiesFromString } from './utils'
 
+export interface ShikiMagicMoveRendererProps {
+  animate?: boolean
+  tokens: KeyedTokensInfo
+  previous?: KeyedTokensInfo
+  options?: MagicMoveRenderOptions
+  onStart?: () => void
+  onEnd?: () => void
+  className?: string
+  style?: React.CSSProperties
+}
+
 /**
  * A wrapper component to `MagicMoveRenderer`
  */
@@ -16,16 +27,7 @@ export function ShikiMagicMoveRenderer(
     onEnd,
     className,
     style,
-  }: {
-    animate?: boolean
-    tokens: KeyedTokensInfo
-    previous?: KeyedTokensInfo
-    options?: MagicMoveRenderOptions
-    onStart?: () => void
-    onEnd?: () => void
-    className?: string
-    style?: React.CSSProperties
-  },
+  }: ShikiMagicMoveRendererProps,
 ) {
   const container = React.useRef<HTMLPreElement>(null)
   const renderer = React.useRef<Renderer>()
@@ -59,9 +61,9 @@ export function ShikiMagicMoveRenderer(
     }
 
     render()
-  // FIXME: we should only re-render when tokens change, but react-hooks rule doesn't allow.
-  // Try to correct the dependency array if something goes wrong.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // FIXME: we should only re-render when tokens change, but react-hooks rule doesn't allow.
+    // Try to correct the dependency array if something goes wrong.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokens])
 
   return (
