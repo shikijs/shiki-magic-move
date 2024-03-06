@@ -177,7 +177,7 @@ watch(
 </script>
 
 <template>
-  <div class="h-screen flex flex-col font-sans max-h-screen px4 py4 gap-4">
+  <div class="flex flex-col font-sans min-h-screen lg:max-h-screen px4 py4 gap-4">
     <div class="flex flex-col items-center flex-none  text-center">
       <span class="text-2xl font-200 bg-gradient-to-r from-teal to-orange inline-block text-transparent bg-clip-text">
         <span>Shiki</span>
@@ -191,11 +191,11 @@ watch(
     </div>
     <div class="grid md:grid-cols-2 gap-4 flex-auto of-hidden">
       <div class="of-hidden flex flex-col gap-4">
-        <div class="flex-none flex flex-wrap gap-4 items-center mb--2px">
+        <div class="flex-none flex flex-wrap gap-4 items-center mb--4px">
           <button class="border border-gray:20 rounded px3 py1" @click="reset">
             {{ lang === 'vue' ? 'Toggle Examples' : 'Reset Example' }}
           </button>
-          <label>
+          <label class="text-sm flex items-center gap-1">
             <input
               v-model="autoCommit"
               type="checkbox"
@@ -205,13 +205,13 @@ watch(
           <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
             Commit Changes
           </button>
-          <div v-if="isAnimating" class="animate-pulse text-green">
+          <div class="transition text-green text-sm" :class="isAnimating ? 'animate-pulse' : 'op0'">
             Animating...
           </div>
         </div>
         <textarea
           v-model="input"
-          class="font-mono w-full h-full flex-auto p-4 border border-gray:20 rounded bg-transparent"
+          class="font-mono w-full h-full flex-auto p-4 border border-gray:20 rounded bg-transparent min-h-100"
           @keydown.meta.enter.prevent="commit"
         />
         <div class="flex-none flex flex-wrap gap-6 items-center">
@@ -223,7 +223,7 @@ watch(
             <input
               v-model="duration"
               type="range" min="100" max="20000"
-              class="w-50"
+              class="w-40"
             >
           </label>
           <label class="flex flex-col gap-1">
@@ -234,10 +234,10 @@ watch(
             <input
               v-model="stagger"
               type="range" min="0" max="20"
-              class="w-50"
+              class="w-40"
             >
           </label>
-          <label>
+          <label class="text-sm flex items-center gap-1">
             <input
               v-model="useDebugStyles"
               type="checkbox"
@@ -251,10 +251,10 @@ watch(
         </div>
       </div>
       <div class="of-auto flex flex-col gap-4" :class="useDebugStyles ? 'magic-move-debug-style' : ''">
-        <div class="flex-none flex flex-wrap gap-4 items-center">
+        <div class="flex-none flex flex-wrap gap-2 items-center">
           <select
             v-model="theme"
-            class="border border-gray:20 rounded px2 py1"
+            class="border border-gray:20 rounded px2 py1 text-sm"
           >
             <option
               v-for="t of bundledThemesInfo"
@@ -266,7 +266,7 @@ watch(
           </select>
           <select
             v-model="lang"
-            class="border border-gray:20 rounded px2 py1"
+            class="border border-gray:20 rounded px2 py1 text-sm"
           >
             <option
               v-for="l of bundledLanguagesInfo"
@@ -276,17 +276,16 @@ watch(
               {{ l.name }}
             </option>
           </select>
-          Renderer:
           <select
             v-model="rendererType"
-            class="border border-gray:20 rounded px2 py1 ml--2"
+            class="border border-gray:20 rounded px2 py1 text-sm"
           >
             <option value="vue">
-              Vue
+              Vue Renderer
             </option>
           </select>
         </div>
-        <div ref="rendererContainer" />
+        <div ref="rendererContainer" class="of-auto" />
       </div>
     </div>
   </div>
