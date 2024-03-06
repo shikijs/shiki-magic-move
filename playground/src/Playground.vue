@@ -282,11 +282,11 @@ watch(
               Vue
             </option>
           </select>
-          <div v-if="isAnimating" class="animate-pulse text-green">
-            Animating...
-          </div>
         </div>
         <div ref="rendererContainer" />
+        <div v-if="isAnimating" class="animate-pulse text-green">
+          Animating...
+        </div>
       </div>
     </div>
   </div>
