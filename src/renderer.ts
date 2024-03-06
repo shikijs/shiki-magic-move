@@ -61,17 +61,19 @@ export class MagicMoveRenderer {
     this.container.prepend(this.anchor)
   }
 
-  private updateTokenToEl(el: HTMLElement, token: KeyedToken) {
+  private updateTokenToEl(el: HTMLElement, token: KeyedToken, applyStyle = true) {
     if (token.content !== '\n') {
       el.textContent = token.content
       el.classList.add(`${CLASS_PREFIX}-item`)
     }
-    if (token.htmlStyle)
-      el.setAttribute('style', token.htmlStyle)
-    if (token.color)
-      el.style.color = token.color
-    if (token.bgColor)
-      el.style.backgroundColor = token.bgColor
+    if (applyStyle) {
+      if (token.htmlStyle)
+        el.setAttribute('style', token.htmlStyle)
+      if (token.color)
+        el.style.color = token.color
+      if (token.bgColor)
+        el.style.backgroundColor = token.bgColor
+    }
   }
 
   private registerTransitionEnd(el: HTMLElement, cb: () => void) {
@@ -153,6 +155,9 @@ export class MagicMoveRenderer {
     this.previousPromises.forEach(p => p.resolve())
     this.previousPromises = []
 
+    // Callbacks to run after forced reflow
+    const postReflow: (() => void)[] = []
+
     const {
       globalScale: scale,
     } = this.options
@@ -169,7 +174,11 @@ export class MagicMoveRenderer {
     const newChildren = step.tokens.map((token) => {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
-        this.updateTokenToEl(el, token)
+        this.updateTokenToEl(el, token, false)
+        postReflow.push(() => {
+          // Update color and style after reflow
+          this.updateTokenToEl(el, token)
+        })
         move.push(el)
         newDomMap.set(token.key, el)
         this.mapDom.delete(token.key)
@@ -202,9 +211,6 @@ export class MagicMoveRenderer {
 
     this.mapDom = newDomMap
 
-    // Callbacks to run after forced reflow
-    const postReflow: (() => void)[] = []
-
     // Lock leave elements to their position with absolute positioning
     leave.forEach((el, idx) => {
       el.style.position = 'absolute'
@@ -220,7 +226,7 @@ export class MagicMoveRenderer {
       el.classList.add(CLASS_LEAVE_FROM)
       el.classList.add(CLASS_LEAVE_ACTIVE)
 
-      postReflow.push(() => {
+      postReflow.unshift(() => {
         el.classList.remove(CLASS_LEAVE_FROM)
         el.classList.add(CLASS_LEAVE_TO)
       })
@@ -279,7 +285,7 @@ export class MagicMoveRenderer {
       else
         el.style.removeProperty('--smm-stagger')
 
-      postReflow.push(() => {
+      postReflow.unshift(() => {
         // Remove transform overrides, so it will start animating back to the new position
         el.classList.add(CLASS_MOVE)
         el.style.transform = el.style.transitionDuration = el.style.transitionDelay = ''
@@ -300,7 +306,7 @@ export class MagicMoveRenderer {
         this.container.style.height = `${containerRect.height / scale}px`
         this.container.style.width = `${containerRect.width / scale}px`
 
-        postReflow.push(() => {
+        postReflow.unshift(() => {
           this.container.classList.add(CLASS_CONTAINER)
           this.container.style.transitionDuration = this.container.style.transitionDelay = ''
           this.container.style.height = `${newRect.height / scale}px`
