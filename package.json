@@ -83,6 +83,12 @@
     "vue": "^3.4.0"
   },
   "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
     "shiki": {
       "optional": true
     },
