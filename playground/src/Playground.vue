@@ -3,10 +3,11 @@ import type { Highlighter } from 'shiki'
 import { getHighlighter } from 'shiki'
 import { bundledThemesInfo } from 'shiki/themes'
 import { bundledLanguagesInfo } from 'shiki/langs'
-import { ref, shallowRef, watch } from 'vue'
+import { ref, shallowRef, watch, watchEffect } from 'vue'
 import { toRefs, useLocalStorage } from '@vueuse/core'
-import { ShikiMagicMove } from '../../src/vue'
 import { vueAfter, vueBefore } from './fixture'
+import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
+import { createRendererVue } from './renderer/vue'
 
 const defaultOptions = {
   theme: 'vitesse-dark',
@@ -16,6 +17,7 @@ const defaultOptions = {
   code: vueBefore,
   useDebugStyles: false,
   stagger: 3,
+  rendererType: 'vue' as RendererType,
 }
 
 const options = useLocalStorage('shiki-magic-move-options', defaultOptions, { mergeDefaults: true })
@@ -28,12 +30,16 @@ const {
   autoCommit,
   useDebugStyles,
   stagger,
+  rendererType,
 } = toRefs(options)
 
 const example = ref(vueBefore)
 const input = ref(code.value)
 const highlighter = ref<Highlighter>()
 const isAnimating = ref(false)
+const rendererContainer = ref<HTMLElement>()
+
+let renderer: RendererFactoryResult
 
 const loadingPromise = shallowRef<Promise<void> | undefined>(
   getHighlighter({
@@ -44,6 +50,52 @@ const loadingPromise = shallowRef<Promise<void> | undefined>(
     loadingPromise.value = undefined
   }),
 )
+
+const rendererOptions: RendererFactoryOptions = {
+  onEnd() {
+    isAnimating.value = false
+  },
+  onStart() {
+    isAnimating.value = true
+  },
+}
+
+watch(
+  rendererType,
+  () => {
+    if (renderer) {
+      renderer?.dispose()
+      renderer = undefined as any
+    }
+    rendererUpdate()
+  },
+  { flush: 'sync' },
+)
+
+function rendererUpdate() {
+  if (!rendererContainer.value || !highlighter.value || loadingPromise.value)
+    return
+
+  const payload: RendererUpdatePayload = {
+    highlighter: highlighter.value,
+    theme: theme.value,
+    lang: lang.value,
+    code: code.value,
+    class: 'font-mono w-fit p-4 border border-gray:20 shadow-xl rounded of-hidden',
+    options: {
+      duration: duration.value,
+      stagger: stagger.value,
+    },
+  }
+
+  if (!renderer) {
+    renderer = createRendererVue(rendererOptions)
+    renderer.mount(rendererContainer.value, payload)
+  }
+  else {
+    renderer.update(payload)
+  }
+}
 
 const samplesCache = new Map<string, Promise<string>>()
 
@@ -80,6 +132,11 @@ function commit() {
 
 let timer: ReturnType<typeof setTimeout> | undefined
 
+watchEffect(
+  () => rendererUpdate(),
+  { flush: 'post' },
+)
+
 watch(
   input,
   () => {
@@ -112,6 +169,9 @@ watch(
       .then(() => {
         loadingPromise.value = undefined
       })
+  },
+  {
+    flush: 'sync',
   },
 )
 </script>
@@ -213,27 +273,20 @@ watch(
               {{ l.name }}
             </option>
           </select>
+          Renderer:
+          <select
+            v-model="rendererType"
+            class="border border-gray:20 rounded px2 py1 ml--2"
+          >
+            <option value="vue">
+              Vue
+            </option>
+          </select>
           <div v-if="isAnimating" class="animate-pulse text-green">
             Animating...
           </div>
         </div>
-        <ShikiMagicMove
-          v-if="highlighter && !loadingPromise"
-          :highlighter="highlighter"
-          :code="code"
-          :lang="lang"
-          :theme="theme"
-          :options="{ duration, stagger }"
-          class="font-mono w-fit p-4 border border-gray:20 shadow-xl rounded of-hidden"
-          @start="isAnimating = true"
-          @end="isAnimating = false"
-        />
-        <div
-          v-else
-          class="font-mono w-full h-full p-4 border border-gray:20 shadow-xl rounded"
-        >
-          <span class="animate-pulse">Loading...</span>
-        </div>
+        <div ref="rendererContainer" />
       </div>
     </div>
   </div>
