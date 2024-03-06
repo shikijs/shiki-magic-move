@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import { createApp, h, reactive, shallowReactive } from 'vue'
+import { createApp, h, shallowReactive } from 'vue'
 import { ShikiMagicMove } from '../../../src/vue'
 import type { RendererFactory, RendererFactoryResult } from './types'
 
