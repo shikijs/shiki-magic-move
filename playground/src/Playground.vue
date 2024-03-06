@@ -205,6 +205,9 @@ watch(
           <button v-if="!autoCommit" class="border border-gray:20 rounded px3 py1" @click="commit">
             Commit Changes
           </button>
+          <div v-if="isAnimating" class="animate-pulse text-green">
+            Animating...
+          </div>
         </div>
         <textarea
           v-model="input"
@@ -282,9 +285,6 @@ watch(
               Vue
             </option>
           </select>
-          <div v-if="isAnimating" class="animate-pulse text-green">
-            Animating...
-          </div>
         </div>
         <div ref="rendererContainer" />
       </div>
