@@ -28,8 +28,17 @@ export function ShikiMagicMove(props: ShikiMagicMoveProps) {
   )
 
   const result = React.useMemo(
-    () => machine.current!.commit(props.code, props.options),
-    [props.code, props.options],
+    () => {
+      if (
+        props.code === machine.current!.current.code
+        && props.theme === machine.current!.current.themeName
+        && props.lang === machine.current!.current.lang
+      )
+        return machine.current!
+
+      return machine.current!.commit(props.code, props.options)
+    },
+    [props.code, props.options, props.theme, props.lang],
   )
 
   return (

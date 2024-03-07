@@ -13,10 +13,11 @@ export interface KeyedToken extends ThemedToken {
   key: string
 }
 
-export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootStyle'> {
+export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootStyle' | 'themeName'> {
   code: string
   hash: string
   tokens: KeyedToken[]
+  lang?: string
 }
 
 export interface MagicMoveRenderOptions {

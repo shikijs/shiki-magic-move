@@ -62,6 +62,8 @@ export function codeToKeyedTokens<
     bg: result.bg,
     fg: result.fg,
     rootStyle: result.rootStyle,
+    themeName: result.themeName,
+    lang: options.lang,
   }
 }
 
