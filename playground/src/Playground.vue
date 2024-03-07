@@ -6,8 +6,9 @@ import { bundledLanguagesInfo } from 'shiki/langs'
 import { ref, shallowRef, watch, watchEffect } from 'vue'
 import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
-import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 import { createRendererVue } from './renderer/vue'
+import { createRendererReact } from './renderer/react'
+import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 
 const defaultOptions = {
   theme: 'vitesse-dark',
@@ -89,7 +90,9 @@ function rendererUpdate() {
   }
 
   if (!renderer) {
-    renderer = createRendererVue(rendererOptions)
+    renderer = rendererType.value === 'vue'
+      ? createRendererVue(rendererOptions)
+      : createRendererReact(rendererOptions)
     renderer.mount(rendererContainer.value, payload)
   }
   else {
@@ -282,6 +285,9 @@ watch(
           >
             <option value="vue">
               Vue Renderer
+            </option>
+            <option value="react">
+              React Renderer
             </option>
           </select>
         </div>
