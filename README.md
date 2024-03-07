@@ -14,6 +14,8 @@ This is a rather low-level library, you usually want to use it with a high-level
 
 If you want to integrate it into your own project, you might want to read the source code a bit.
 
+This package provides framework-agnostic [core](./src/core.ts) and [renderer](./src/renderer.ts), as well as framework wrappers like [Vue](./src/vue) and [React](./src/react).
+
 ## How it works
 
 Check [this blog post](https://antfu.me/posts/shiki-magic-move).
