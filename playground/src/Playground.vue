@@ -287,7 +287,7 @@ watch(
               Vue Renderer
             </option>
             <option value="react">
-              React
+              React Renderer
             </option>
           </select>
         </div>
