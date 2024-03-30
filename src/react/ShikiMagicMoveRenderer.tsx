@@ -69,7 +69,7 @@ export function ShikiMagicMoveRenderer(
   return (
     <pre
       ref={container}
-      className={`shiki-magic-move-container ${className}`}
+      className={`shiki-magic-move-container ${className || ''}`.trim()}
       style={style}
     >
       {
