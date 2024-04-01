@@ -24,7 +24,7 @@ Each of the framework wrappers provides the following components:
 
 `ShikiMagicMove` requires you to provide a Shiki highlighter instance. For example, in Vue:
 
-```html
+```vue
 <script setup>
 import { ShikiMagicMove } from 'shiki-magic-move/vue'
 import { getHighlighter } from 'shiki'
@@ -56,14 +56,14 @@ Whenever the `code` changes, the component will animate the changes.
 
 `ShikiMagicMovePrecompiled` is a lighter version of `ShikiMagicMove` that doesn't require Shiki. It's useful when you want to animate the compiled tokens directly. For example, in Vue:
 
-```html
+```vue
 <script setup>
 import { ShikiMagicMovePrecompiled } from 'shiki-magic-move/vue'
 import { ref } from 'vue'
 
 const step = ref(1)
 const compiledSteps = [/* Compiled token steps */]
-<script>
+</script>
 
 <template>
   <ShikiMagicMovePrecompiled
