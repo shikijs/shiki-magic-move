@@ -84,22 +84,54 @@ export class MagicMoveRenderer {
     this.applyElementStyle(el, token)
   }
 
-  private applyContainerStyle(step: KeyedTokensInfo) {
-    if (!this.options.containerStyle)
-      return
-
+  private applyNodeStyle(node: HTMLElement, step: KeyedTokensInfo) {
     if (step.bg)
-      this.container.style.backgroundColor = step.bg
+      node.style.backgroundColor = step.bg
     if (step.fg)
-      this.container.style.color = step.fg
+      node.style.color = step.fg
     if (step.rootStyle) {
       const items = step.rootStyle.split(';')
       for (const item of items) {
         const [key, value] = item.split(':')
         if (key && value)
-          this.container.style.setProperty(key.trim(), value.trim())
+          node.style.setProperty(key.trim(), value.trim())
       }
     }
+  }
+
+  private applyContainerStyle(step: KeyedTokensInfo) {
+    if (!this.options.containerStyle)
+      return
+    this.applyNodeStyle(this.container, step)
+  }
+
+  private checkContainerStyleChanged(step: KeyedTokensInfo) {
+    if (!this.options.containerStyle)
+      return false
+
+    // we need to clone the node and apply the properties because
+    // if you set the style of backgroundColor=#ffffff and try to access it via
+    // element.style.backgroundColor you get back rgb(255, 255, 255);
+    // this should also be true for other css properties so better be safe than sorry
+    const cloned = this.container.cloneNode() as HTMLElement
+
+    this.applyNodeStyle(cloned, step)
+
+    const bg = cloned.style.backgroundColor !== this.container.style.backgroundColor
+    const fg = cloned.style.color !== this.container.style.color
+    let rootStyle = false
+    if (step.rootStyle) {
+      const items = step.rootStyle.split(';')
+      for (const item of items) {
+        const [key, value] = item.split(':')
+        if (key && value) {
+          rootStyle = rootStyle || this.container.style.getPropertyValue(key.trim()) !== cloned.style.getPropertyValue(key.trim())
+          if (rootStyle)
+            break
+        }
+      }
+    }
+    return bg || fg || rootStyle
   }
 
   private registerTransitionEnd(el: HTMLElement, cb: () => void) {
@@ -355,7 +387,7 @@ export class MagicMoveRenderer {
       if (this.isFirstRender) {
         this.applyContainerStyle(step)
       }
-      else {
+      else if (this.checkContainerStyleChanged(step)) {
         postReflow.push(() => {
           this.container.classList.add(CLASS_CONTAINER_RESTYLE)
           this.applyContainerStyle(step)
