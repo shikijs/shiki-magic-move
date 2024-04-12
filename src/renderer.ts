@@ -387,17 +387,19 @@ export class MagicMoveRenderer {
       if (this.isFirstRender) {
         this.applyContainerStyle(step)
       }
-      else if (this.checkContainerStyleChanged(step)) {
-        postReflow.push(() => {
-          this.container.classList.add(CLASS_CONTAINER_RESTYLE)
-          this.applyContainerStyle(step)
-        })
+      else {
+        if (this.checkContainerStyleChanged(step)) {
+          postReflow.push(() => {
+            this.container.classList.add(CLASS_CONTAINER_RESTYLE)
+            this.applyContainerStyle(step)
+          })
 
-        promises.push(
-          this.registerTransitionEnd(this.container, () => {
-            this.container.classList.remove(CLASS_CONTAINER_RESTYLE)
-          }),
-        )
+          promises.push(
+            this.registerTransitionEnd(this.container, () => {
+              this.container.classList.remove(CLASS_CONTAINER_RESTYLE)
+            }),
+          )
+        }
       }
     }
 
