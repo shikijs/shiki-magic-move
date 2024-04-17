@@ -1,7 +1,7 @@
 {
   "name": "shiki-magic-move",
   "type": "module",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "packageManager": "pnpm@9.0.2",
   "description": "Smoothly animated code blocks with Shiki",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
