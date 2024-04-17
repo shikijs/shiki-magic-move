@@ -16,16 +16,23 @@ export interface ShikiMagicMoveProps {
 }
 
 export function ShikiMagicMove(props: ShikiMagicMoveProps) {
-  const codeToTokens = React.useRef<(code: string) => KeyedTokensInfo>()
-  codeToTokens.current = code => codeToKeyedTokens(props.highlighter, code, {
-    lang: props.lang,
-    theme: props.theme,
-  })
+  const codeToTokens = React.useRef<(code: string, lineNumbers?: boolean) => KeyedTokensInfo>()
+  codeToTokens.current = (code, lineNumbers) => codeToKeyedTokens(
+    props.highlighter,
+    code,
+    {
+      lang: props.lang,
+      theme: props.theme,
+    },
+    lineNumbers,
+  )
 
   const machine = React.useRef<ReturnType<typeof createMagicMoveMachine>>()
   machine.current = machine.current || createMagicMoveMachine(
-    code => codeToTokens.current!(code),
+    (code, lineNumbers) => codeToTokens.current!(code, lineNumbers),
   )
+
+  const lineNumbers = props.options?.lineNumbers ?? false
 
   const result = React.useMemo(
     () => {
@@ -33,12 +40,12 @@ export function ShikiMagicMove(props: ShikiMagicMoveProps) {
         props.code === machine.current!.current.code
         && props.theme === machine.current!.current.themeName
         && props.lang === machine.current!.current.lang
+        && lineNumbers === machine.current!.current.lineNumbers
       )
         return machine.current!
-
       return machine.current!.commit(props.code, props.options)
     },
-    [props.code, props.options, props.theme, props.lang],
+    [props.code, props.options, props.theme, props.lang, lineNumbers],
   )
 
   return (

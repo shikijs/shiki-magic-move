@@ -1,5 +1,5 @@
 import type { HighlighterCore } from 'shiki/core'
-import type { MagicMoveRenderOptions } from '../../../src/core'
+import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../../../src/core'
 
 export type RendererType = 'vue' | 'react'
 
@@ -9,7 +9,7 @@ export interface RendererUpdatePayload {
   lang: string
   theme: string
   class?: string
-  options?: MagicMoveRenderOptions
+  options?: MagicMoveRenderOptions & MagicMoveDifferOptions
 }
 
 export interface RendererFactoryResult {

@@ -75,7 +75,7 @@ export const ShikiMagicMoveRenderer = /* #__PURE__ */ defineComponent({
             'span',
             {
               style: [{ color: token.color }, token.htmlStyle],
-              class: 'shiki-magic-move-item',
+              class: ['shiki-magic-move-item', token.htmlClass],
               key: token.key,
             },
             token.content,

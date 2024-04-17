@@ -8,20 +8,20 @@ export * from './types'
 type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 export function createMagicMoveMachine(
-  codeToKeyedTokens: (code: string) => KeyedTokensInfo,
+  codeToKeyedTokens: (code: string, lineNumbers?: boolean) => KeyedTokensInfo,
   options: MagicMoveDifferOptions = {},
 ) {
   const EMPTY = toKeyedTokens('', [])
   let previous = EMPTY
   let current = EMPTY
 
-  function commit(code: string, override: MagicMoveDifferOptions = {}): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
+  function commit(code: string, override?: MagicMoveDifferOptions): { current: KeyedTokensInfo, previous: KeyedTokensInfo } {
     previous = current
-    const newTokens = codeToKeyedTokens(code);
-    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, {
-      ...options,
-      ...override,
-    }))
+    const mergedOptions = override
+      ? { ...options, ...override }
+      : options
+    const newTokens = codeToKeyedTokens(code, mergedOptions.lineNumbers);
+    ({ from: previous, to: current } = syncTokenKeys(previous, newTokens, mergedOptions))
     return {
       current,
       previous,
@@ -50,6 +50,7 @@ export function codeToKeyedTokens<
   highlighter: HighlighterGeneric<BundledLangKeys, BundledThemeKeys>,
   code: string,
   options: ArgumentsType<HighlighterGeneric<BundledLangKeys, BundledThemeKeys>['codeToTokens']>[1],
+  lineNumbers = false,
 ): KeyedTokensInfo {
   const result = highlighter.codeToTokens(code, options)
   return {
@@ -58,6 +59,7 @@ export function codeToKeyedTokens<
       result.tokens,
       // We put the lang and theme to participate in the hash calculation because they can affect the tokenization
       JSON.stringify([options.lang, 'themes' in options ? options.themes : options.theme]),
+      lineNumbers,
     ),
     bg: result.bg,
     fg: result.fg,
@@ -71,27 +73,40 @@ export function toKeyedTokens(
   code: string,
   tokens: ThemedToken[][],
   salt = '',
+  lineNumbers = false,
 ): KeyedTokensInfo {
   const hash = getHash(code + salt)
   let lastOffset = 0
+  let firstOffset = 0
+  const lineNumberDigits = Math.ceil(Math.log10(tokens.length))
   const keyed = splitWhitespaceTokens(tokens)
-    .flatMap((line): ThemedToken[] => {
+    .flatMap((line, lineIdx): ThemedToken[] => {
+      firstOffset = line[0]?.offset || lastOffset
       const lastEl = line[line.length - 1]
       if (!lastEl)
         lastOffset += 1
       else
         lastOffset = lastEl.offset + lastEl.content.length
-      return [
+      const tokens = [
         ...line,
         {
           content: '\n',
           offset: lastOffset,
         },
-      ]
+      ] as KeyedToken[]
+      if (lineNumbers) {
+        tokens.unshift({
+          key: `${hash}-ln-${lineIdx + 1}`,
+          content: `${String(lineIdx + 1).padStart(lineNumberDigits, ' ')}  `,
+          offset: firstOffset,
+          htmlClass: 'shiki-magic-move-line-number',
+        })
+      }
+      return tokens
     })
     .map((token, idx) => {
       const t = token as KeyedToken
-      t.key = `${hash}-${idx}`
+      t.key ||= `${hash}-${idx}`
       return t
     })
 
@@ -99,6 +114,7 @@ export function toKeyedTokens(
     code,
     hash,
     tokens: keyed,
+    lineNumbers,
   }
 }
 

@@ -3,6 +3,11 @@
   white-space: pre;
 }
 
+.shiki-magic-move-line-number {
+  opacity: 0.3;
+  user-select: none;
+}
+
 .shiki-magic-move-item {
   display: inline-block;
   transition: color var(--smm-duration, 0.5s) var(--smm-easing, 'ease');

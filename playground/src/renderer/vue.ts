@@ -1,12 +1,12 @@
 import type { App } from 'vue'
-import { createApp, h, shallowReactive } from 'vue'
+import { createApp, h, reactive } from 'vue'
 import { ShikiMagicMove } from '../../../src/vue'
 import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererVue: RendererFactory = (options): RendererFactoryResult => {
   let app: App | undefined
 
-  const props = shallowReactive({
+  const props = reactive({
     onStart: options.onStart,
     onEnd: options.onEnd,
   })

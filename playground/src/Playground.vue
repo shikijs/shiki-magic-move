@@ -3,7 +3,7 @@ import type { Highlighter } from 'shiki'
 import { getHighlighter } from 'shiki'
 import { bundledThemesInfo } from 'shiki/themes'
 import { bundledLanguagesInfo } from 'shiki/langs'
-import { ref, shallowRef, watch, watchEffect } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
 import { createRendererVue } from './renderer/vue'
@@ -19,6 +19,7 @@ const defaultOptions = {
   useDebugStyles: false,
   stagger: 3,
   rendererType: 'vue' as RendererType,
+  lineNumbers: false,
 }
 
 const options = useLocalStorage('shiki-magic-move-options', defaultOptions, { mergeDefaults: true })
@@ -32,6 +33,7 @@ const {
   useDebugStyles,
   stagger,
   rendererType,
+  lineNumbers,
 } = toRefs(options)
 
 const example = ref(vueBefore)
@@ -86,6 +88,7 @@ function rendererUpdate() {
     options: {
       duration: duration.value,
       stagger: stagger.value,
+      lineNumbers: lineNumbers.value,
     },
   }
 
@@ -135,9 +138,14 @@ function commit() {
 
 let timer: ReturnType<typeof setTimeout> | undefined
 
-watchEffect(
-  () => rendererUpdate(),
-  { flush: 'post' },
+watch(
+  [theme, lang, code, duration, stagger, lineNumbers, rendererContainer, highlighter],
+  (n, o) => {
+    if (n.every((v, i) => v === o[i]))
+      return
+    rendererUpdate()
+  },
+  { flush: 'post', deep: true, immediate: true },
 )
 
 watch(
@@ -246,6 +254,13 @@ watch(
               type="checkbox"
             >
             Style for debugging
+          </label>
+          <label class="text-sm flex items-center gap-1">
+            <input
+              v-model="lineNumbers"
+              type="checkbox"
+            >
+            Line Numbers
           </label>
           <div class="flex-auto" />
           <button class="border border-gray:20 rounded px3 py1" @click="resetOptions">

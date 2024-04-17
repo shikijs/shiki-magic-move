@@ -91,7 +91,7 @@ export function ShikiMagicMoveRenderer(
                   ...createCSSPropertiesFromString(token.htmlStyle),
                   color: token.color,
                 }}
-                className="shiki-magic-move-item"
+                className={['shiki-magic-move-item', token.htmlClass].filter(Boolean).join(' ')}
                 key={token.key}
               >
                 {token.content}

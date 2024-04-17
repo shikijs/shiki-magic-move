@@ -35,10 +35,15 @@ export const ShikiMagicMove = /* #__PURE__ */ defineComponent({
   ],
   setup(props, { emit }) {
     const machine = createMagicMoveMachine(
-      code => codeToKeyedTokens(props.highlighter, code, {
-        lang: props.lang,
-        theme: props.theme,
-      }),
+      code => codeToKeyedTokens(
+        props.highlighter,
+        code,
+        {
+          lang: props.lang,
+          theme: props.theme,
+        },
+        props.options.lineNumbers,
+      ),
       props.options,
     )
 

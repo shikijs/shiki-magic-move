@@ -11,6 +11,7 @@ export interface MatchedRanges {
 
 export interface KeyedToken extends ThemedToken {
   key: string
+  htmlClass?: string
 }
 
 export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootStyle' | 'themeName'> {
@@ -18,6 +19,7 @@ export interface KeyedTokensInfo extends Pick<TokensResult, 'bg' | 'fg' | 'rootS
   hash: string
   tokens: KeyedToken[]
   lang?: string
+  lineNumbers: boolean
 }
 
 export interface MagicMoveRenderOptions {
@@ -87,6 +89,12 @@ export interface MagicMoveRenderOptions {
 }
 
 export interface MagicMoveDifferOptions {
+  /**
+   * Show line numbers
+   *
+   * @default false
+   */
+  lineNumbers?: boolean
   /**
    * Split the tokens at the edge of diff chunks
    *

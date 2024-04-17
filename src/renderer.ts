@@ -73,6 +73,8 @@ export class MagicMoveRenderer {
   private applyElementStyle(el: HTMLElement, token: KeyedToken) {
     if (token.htmlStyle)
       el.setAttribute('style', token.htmlStyle)
+    if (token.htmlClass)
+      el.className = [`${CLASS_PREFIX}-item`, token.htmlClass].join(' ')
     if (token.color)
       el.style.color = token.color
     if (token.bgColor)
