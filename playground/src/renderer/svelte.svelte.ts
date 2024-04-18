@@ -1,12 +1,11 @@
 import { mount, unmount } from 'svelte'
-import { shallowReactive } from 'vue'
 import { ShikiMagicMove } from '../../../src/svelte'
 import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererSvelte: RendererFactory = (options): RendererFactoryResult => {
-  let app: Record<string, any> | undefined
+  let app: any
 
-  const props = shallowReactive({
+  const props = $state({
     onStart: options.onStart,
     onEnd: options.onEnd,
   })

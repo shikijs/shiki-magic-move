@@ -8,7 +8,7 @@ import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
 import { createRendererVue } from './renderer/vue'
 import { createRendererReact } from './renderer/react'
-import { createRendererSvelte } from './renderer/svelte'
+import { createRendererSvelte } from './renderer/svelte.svelte'
 import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 
 const defaultOptions = {
