@@ -16,7 +16,7 @@
 
 	const { highlighter, lang, theme, code, options, onStart, onEnd, ...props }: ShikiMagicMoveProps = $props()
 	const machine = createMagicMoveMachine(
-		(code) => codeToKeyedTokens(highlighter, code, { lang, theme }),
+		(code) => codeToKeyedTokens(highlighter, code, { lang, theme }, options?.lineNumbers),
 		options
 	)
 	const result = $derived(machine.commit(code))
