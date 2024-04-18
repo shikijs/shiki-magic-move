@@ -1,0 +1,34 @@
+import { mount, unmount } from 'svelte'
+import { shallowReactive } from 'vue'
+import { ShikiMagicMove } from '../../../src/svelte'
+import type { RendererFactory, RendererFactoryResult } from './types'
+
+export const createRendererSvelte: RendererFactory = (options): RendererFactoryResult => {
+  let app: Record<string, any> | undefined
+
+  const props = shallowReactive({
+    onStart: options.onStart,
+    onEnd: options.onEnd,
+  })
+
+  return {
+    mount: (element, payload) => {
+      Object.assign(props, payload)
+      if (app)
+        return
+      app = mount(ShikiMagicMove, { target: element, props })
+      // eslint-disable-next-line no-console
+      console.log('Svelte renderer mounted')
+    },
+
+    update: (payload) => {
+      Object.assign(props, payload)
+    },
+
+    dispose: () => {
+      if (app)
+        unmount(app)
+      app = undefined
+    },
+  }
+}
