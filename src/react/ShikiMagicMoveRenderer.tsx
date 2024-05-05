@@ -63,7 +63,6 @@ export function ShikiMagicMoveRenderer(
     render()
     // FIXME: we should only re-render when tokens change, but react-hooks rule doesn't allow.
     // Try to correct the dependency array if something goes wrong.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokens])
 
   return (

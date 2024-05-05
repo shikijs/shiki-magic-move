@@ -27,7 +27,6 @@ export const createRendererReact: RendererFactory = (options): RendererFactoryRe
 
     console.log('React rendering', count)
 
-    // eslint-disable-next-line react/prop-types
     return <ShikiMagicMove {...props} className={props.class} />
   }
 
