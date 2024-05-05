@@ -8,6 +8,7 @@ import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
 import { createRendererVue } from './renderer/vue'
 import { createRendererReact } from './renderer/react'
+import { createRendererSvelte } from './renderer/svelte.svelte'
 import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 
 const defaultOptions = {
@@ -93,9 +94,18 @@ function rendererUpdate() {
   }
 
   if (!renderer) {
-    renderer = rendererType.value === 'vue'
-      ? createRendererVue(rendererOptions)
-      : createRendererReact(rendererOptions)
+    switch (rendererType.value) {
+      case 'vue':
+        renderer = createRendererVue(rendererOptions)
+        break
+      case 'react':
+        renderer = createRendererReact(rendererOptions)
+        break
+      case 'svelte':
+        renderer = createRendererSvelte(rendererOptions)
+        break
+    }
+
     renderer.mount(rendererContainer.value, payload)
   }
   else {
@@ -303,6 +313,9 @@ watch(
             </option>
             <option value="react">
               React Renderer
+            </option>
+            <option value="svelte">
+              Svelte Renderer
             </option>
           </select>
         </div>
