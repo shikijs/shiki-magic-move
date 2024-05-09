@@ -1,68 +1,72 @@
-<script lang="ts">
-	import { MagicMoveRenderer } from '../renderer'
-	import type { MagicMoveRenderOptions, KeyedTokensInfo } from '../types.d.ts'
+<script lang='ts'>
+  import { MagicMoveRenderer } from 'shiki-magic-move/renderer'
+  import type { KeyedTokensInfo, MagicMoveRenderOptions } from 'shiki-magic-move/types'
 
-	interface ShikiMagicMoveRendererProps {
-		class?: string
-		animate?: boolean
-		tokens: KeyedTokensInfo
-		previous?: KeyedTokensInfo
-		options?: MagicMoveRenderOptions
-		onStart?: () => void
-		onEnd?: () => void
-	}
+  interface ShikiMagicMoveRendererProps {
+    class?: string
+    animate?: boolean
+    tokens: KeyedTokensInfo
+    previous?: KeyedTokensInfo
+    options?: MagicMoveRenderOptions
+    onStart?: () => void
+    onEnd?: () => void
+  }
 
-	const {
-		animate = true,
-		tokens,
-		previous,
-		options,
-		onStart,
-		onEnd,
-		...props
-	}: ShikiMagicMoveRendererProps = $props()
+  const {
+    animate = true,
+    tokens,
+    previous,
+    options,
+    onStart,
+    onEnd,
+    ...props
+  }: ShikiMagicMoveRendererProps = $props()
 
-	let container: HTMLPreElement
-	let renderer: MagicMoveRenderer
-	let isMounted = $state(false)
-	
-	$effect(() => {
-		if (!container) return
-		container.innerHTML = ''
-		isMounted = true
-		renderer = new MagicMoveRenderer(container)
-	})
+  let container: HTMLPreElement
+  let renderer: MagicMoveRenderer
+  let isMounted = $state(false)
 
-	$effect(() => {
-		async function render() {
-			if (!renderer) return
-			Object.assign(renderer.options, options)
-			if (animate) {
-				if (previous) renderer.replace(previous)
-				onStart?.()
-				await renderer.render(tokens)
-				onEnd?.()
-			} else {
-				renderer.replace(tokens)
-			}
-		}
-		render()
-	})
+  $effect(() => {
+    if (!container)
+      return
+    container.innerHTML = ''
+    isMounted = true
+    renderer = new MagicMoveRenderer(container)
+  })
+
+  $effect(() => {
+    async function render() {
+      if (!renderer)
+        return
+      Object.assign(renderer.options, options)
+      if (animate) {
+        if (previous)
+          renderer.replace(previous)
+        onStart?.()
+        await renderer.render(tokens)
+        onEnd?.()
+      }
+      else {
+        renderer.replace(tokens)
+      }
+    }
+    render()
+  })
 </script>
 
-<pre bind:this={container} class="shiki-magic-move-container {props?.class}" {...props}>
+<pre bind:this={container} class='shiki-magic-move-container {props?.class}' {...props}>
   <!-- render initial tokens for SSR -->
   {#if !isMounted}
-		{#each tokens.tokens as token (token.key)}
-			{#if token.content === '\n'}
-				<br />
-			{/if}
+    {#each tokens.tokens as token (token.key)}
+      {#if token.content === '\n'}
+        <br />
+      {/if}
       <span
-				class="shiki-magic-move-item"
-				style:color={token.color}
-				style={token.htmlStyle}>
+        class='shiki-magic-move-item'
+        style:color={token.color}
+        style={token.htmlStyle}>
         {token.content}
       </span>
-		{/each}
-	{/if}
+    {/each}
+  {/if}
 </pre>
