@@ -8,11 +8,11 @@
 
 Smoothly animated code blocks with Shiki. [Online Demo](https://shiki-magic-move.netlify.app/).
 
-## Usage
+## About Shiki Magic Move
 
-This is a rather low-level library, you usually want to use it with a high-level integrations like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
+Shiki Magic Move is a low-level library for animating code blocks which uses [Shiki](https://shiki.style/) as the syntax highlighter. You usually want to use it with a high-level integration like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
 
-The package provides framework-agnostic [core](./src/core.ts) and [renderer](./src/renderer.ts) and framework wrappers for [Vue](./src/vue) and [React](./src/react).
+At the core of the `shiki-magic-move` package is a framework-agnostic [core](./src/core.ts), and [renderer](./src/renderer.ts) — there are also framework wrappers for [Vue](./src/vue), [React](./src/react), and [Svelte](./src/svelte).
 
 Each of the framework wrappers provides the following components:
 
@@ -20,9 +20,19 @@ Each of the framework wrappers provides the following components:
 - `ShikiMagicMovePrecompiled` - animations for compiled tokens, without the dependency on Shiki
 - `ShikiMagicMoveRenderer` - the low-level renderer component
 
-### `ShikiMagicMove`
+The `ShikiMagicMove` component requires you to provide a Shiki highlighter instance, and the styles are also required, and provided by `shiki-magic-move`. Whenever the `code` changes, the component will animate the changes.
 
-`ShikiMagicMove` requires you to provide a Shiki highlighter instance. For example, in Vue:
+## Installation
+
+You're going to need Shiki Magic Move for animating the code blocks, and Shiki for syntax highlighting.
+
+```bash
+npm i shiki-magic-move shiki
+```
+
+## Usage With Vue
+
+Import `shiki-magic-move/vue`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
 ```vue
 <script setup>
@@ -30,29 +40,117 @@ import { ShikiMagicMove } from 'shiki-magic-move/vue'
 import { getHighlighter } from 'shiki'
 import { ref } from 'vue'
 
+import 'shiki-magic-move/dist/style.css'
+
 const highlighter = await getHighlighter({
-  theme: 'nord',
-  langs: ['javascript', 'typescript'],
+	themes: ['nord'],
+	langs: ['javascript', 'typescript'],
 })
 
 const code = ref(`const hello = 'world'`)
 
 function animate() {
-  code.value = `let hi = 'hello'`
+	code.value = `let hi = 'hello'`
 }
 </script>
 
 <template>
-  <ShikiMagicMove :highlighter="highlighter" lang="ts" :code="code" />
-  <button @click="animate">
-    Animate
-  </button>
+	<ShikiMagicMove
+		lang="ts"
+		theme="nord"
+		:highlighter="highlighter"
+		:code="code"
+		:options="{ duration: 800, stagger: 0.3, lineNumbers: true }"
+	/>
+	<button @click="animate">Animate</button>
 </template>
 ```
 
-Whenever the `code` changes, the component will animate the changes.
+## Usage With React
 
-### `ShikiMagicMovePrecompiled`
+Import `shiki-magic-move/react`, and pass the highlighter instance to the `ShikiMagicMove` component.
+
+```tsx
+import { useState, useEffect } from 'react'
+import { ShikiMagicMove } from 'shiki-magic-move/react'
+import { getHighlighter, type HighlighterCore } from 'shiki'
+
+import 'shiki-magic-move/dist/style.css'
+
+function App() {
+	const [code, setCode] = useState(`const hello = 'world'`)
+	const [highlighter, setHighlighter] = useState<HighlighterCore>()
+
+	useEffect(() => {
+		async function initializeHighlighter() {
+			const highlighter = await getHighlighter({
+				themes: ['nord'],
+				langs: ['javascript', 'typescript'],
+			})
+			setHighlighter(highlighter)
+		}
+		initializeHighlighter()
+	}, [])
+
+	function animate() {
+		setCode(`let hi = 'hello'`)
+	}
+
+	return (
+		<div>
+			{highlighter && (
+				<>
+					<ShikiMagicMove
+						lang="ts"
+						theme="nord"
+						highlighter={highlighter}
+						code={code}
+						options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
+					/>
+					<button onClick={animate}>Animate</button>
+				</>
+			)}
+		</div>
+	)
+}
+```
+
+## Usage With Svelte
+
+Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `ShikiMagicMove` component.
+
+```svelte
+<script lang="ts">
+	import { ShikiMagicMove } from 'shiki-magic-move/svelte'
+	import { getHighlighter } from 'shiki'
+
+	import 'shiki-magic-move/dist/style.css'
+
+	let highlighter = getHighlighter({
+		themes: ['nord'],
+		langs: ['javascript', 'typescript'],
+	})
+
+	let code = $state(`const hello = 'world'`)
+
+	function animate() {
+		code = `let hi = 'hello'`
+	}
+</script>
+
+{#await highlighter then highlighter}
+	<ShikiMagicMove
+		lang="ts"
+		theme="nord"
+		{highlighter}
+		{code}
+		options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
+	/>
+	<button onclick={animate}>Animate</button>
+{/await}
+```
+
+### Using a Precompiled Step That Doesn't Require Shiki
 
 `ShikiMagicMovePrecompiled` is a lighter version of `ShikiMagicMove` that doesn't require Shiki. It's useful when you want to animate the compiled tokens directly. For example, in Vue:
 
@@ -108,9 +206,9 @@ const compiledSteps = codeSteps.map(code => machine.commit(code).current)
 // If you do this on server-side or build-time, you can serialize `compiledSteps` into JSON
 ```
 
-## How it works
+## How Does Shiki Magic Move Work
 
-Check [this blog post](https://antfu.me/posts/shiki-magic-move).
+You can read [The Magic In Shiki Magic Move](https://antfu.me/posts/shiki-magic-move) to understand how Shiki Magic Move works.
 
 ## Sponsors
 
