@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
+	import { codeToKeyedTokens, createMagicMoveMachine } from '../core.mjs'
 	import ShikiMagicMoveRenderer from './ShikiMagicMoveRenderer.svelte'
 	import type { HighlighterCore } from 'shiki/core'
-	import type { MagicMoveRenderOptions, MagicMoveDifferOptions } from '../types'
+	import type { MagicMoveRenderOptions, MagicMoveDifferOptions } from '../types.d.ts'
 	
 	interface ShikiMagicMoveProps {
 		highlighter: HighlighterCore

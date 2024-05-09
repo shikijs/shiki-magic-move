@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { syncTokenKeys, toKeyedTokens } from '../core'
+	import { syncTokenKeys, toKeyedTokens } from '../core.mjs'
 	import ShikiMagicMoveRenderer from './ShikiMagicMoveRenderer.svelte'
-	import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
+	import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types.d.ts'
 
 	interface ShikiMagicMovePrecompileProps {
 		steps: KeyedTokensInfo[]
