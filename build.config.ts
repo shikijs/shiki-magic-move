@@ -34,6 +34,9 @@ export default defineBuildConfig({
       await fs.writeFile('dist/svelte.d.ts', 'export * from "./svelte/index.mjs"\n', 'utf-8')
       await fs.writeFile('dist/svelte.d.mts', 'export * from "./svelte/index.mjs"\n', 'utf-8')
       await fs.copyFile('dist/svelte/index.d.ts', 'dist/svelte/index.d.mts')
+      await fs.copyFile('src/core.ts', 'dist/core.ts')
+      await fs.copyFile('src/types.ts', 'dist/types.ts')
+      await fs.copyFile('src/renderer.ts', 'dist/renderer.ts')
     },
   },
 })

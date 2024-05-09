@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { codeToKeyedTokens, createMagicMoveMachine } from '../core.mjs'
+	import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
 	import ShikiMagicMoveRenderer from './ShikiMagicMoveRenderer.svelte'
 	import type { HighlighterCore } from 'shiki/core'
 	import type { MagicMoveRenderOptions, MagicMoveDifferOptions } from '../types.d.ts'
