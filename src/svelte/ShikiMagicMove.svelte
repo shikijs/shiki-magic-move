@@ -12,6 +12,7 @@
     options?: MagicMoveRenderOptions & MagicMoveDifferOptions
     onStart?: () => void
     onEnd?: () => void
+    class?: string
   }
 
   const { highlighter, lang, theme, code, options, onStart, onEnd, ...props }: ShikiMagicMoveProps = $props()

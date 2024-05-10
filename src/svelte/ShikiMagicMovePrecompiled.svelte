@@ -10,6 +10,7 @@
     options?: MagicMoveRenderOptions & MagicMoveDifferOptions
     onStart?: () => void
     onEnd?: () => void
+    class?: string
   }
 
   const {
