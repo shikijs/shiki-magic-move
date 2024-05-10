@@ -1,7 +1,7 @@
 {
   "name": "shiki-magic-move",
   "type": "module",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "packageManager": "pnpm@9.1.0",
   "description": "Smoothly animated code blocks with Shiki",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
@@ -122,7 +122,7 @@
     "eslint": "^9.2.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
-    "eslint-plugin-svelte": "^2.38.0",
+    "eslint-plugin-svelte": "^2.39.0",
     "esno": "^4.7.0",
     "lint-staged": "^15.2.2",
     "pnpm": "^9.1.0",
@@ -138,7 +138,7 @@
     "vite": "^5.2.11",
     "vitest": "^1.6.0",
     "vue": "^3.4.27",
-    "vue-tsc": "^2.0.16"
+    "vue-tsc": "^2.0.17"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"
