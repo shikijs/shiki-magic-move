@@ -10,7 +10,7 @@ Smoothly animated code blocks with Shiki. [Online Demo](https://shiki-magic-move
 
 ## About Shiki Magic Move
 
-Shiki Magic Move is a low-level library for animating code blocks which uses [Shiki](https://shiki.style/) as the syntax highlighter. You usually want to use it with a high-level integration like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
+Shiki Magic Move is a low-level library for animating code blocks, and uses [Shiki](https://shiki.style/) as the syntax highlighter. You usually want to use it with a high-level integration like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
 
 At the core of the `shiki-magic-move` package is a framework-agnostic [core](./src/core.ts), and [renderer](./src/renderer.ts) — there are also framework wrappers for [Vue](./src/vue), [React](./src/react), and [Svelte](./src/svelte).
 
@@ -43,26 +43,28 @@ import { ref } from 'vue'
 import 'shiki-magic-move/dist/style.css'
 
 const highlighter = await getHighlighter({
-	themes: ['nord'],
-	langs: ['javascript', 'typescript'],
+  themes: ['nord'],
+  langs: ['javascript', 'typescript'],
 })
 
 const code = ref(`const hello = 'world'`)
 
 function animate() {
-	code.value = `let hi = 'hello'`
+  code.value = `let hi = 'hello'`
 }
 </script>
 
 <template>
-	<ShikiMagicMove
-		lang="ts"
-		theme="nord"
-		:highlighter="highlighter"
-		:code="code"
-		:options="{ duration: 800, stagger: 0.3, lineNumbers: true }"
-	/>
-	<button @click="animate">Animate</button>
+  <ShikiMagicMove
+    lang="ts"
+    theme="nord"
+    :highlighter="highlighter"
+    :code="code"
+    :options="{ duration: 800, stagger: 0.3, lineNumbers: true }"
+  />
+  <button @click="animate">
+    Animate
+  </button>
 </template>
 ```
 
@@ -71,47 +73,47 @@ function animate() {
 Import `shiki-magic-move/react`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
 ```tsx
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ShikiMagicMove } from 'shiki-magic-move/react'
-import { getHighlighter, type HighlighterCore } from 'shiki'
+import { type HighlighterCore, getHighlighter } from 'shiki'
 
 import 'shiki-magic-move/dist/style.css'
 
 function App() {
-	const [code, setCode] = useState(`const hello = 'world'`)
-	const [highlighter, setHighlighter] = useState<HighlighterCore>()
+  const [code, setCode] = useState(`const hello = 'world'`)
+  const [highlighter, setHighlighter] = useState<HighlighterCore>()
 
-	useEffect(() => {
-		async function initializeHighlighter() {
-			const highlighter = await getHighlighter({
-				themes: ['nord'],
-				langs: ['javascript', 'typescript'],
-			})
-			setHighlighter(highlighter)
-		}
-		initializeHighlighter()
-	}, [])
+  useEffect(() => {
+    async function initializeHighlighter() {
+      const highlighter = await getHighlighter({
+        themes: ['nord'],
+        langs: ['javascript', 'typescript'],
+      })
+      setHighlighter(highlighter)
+    }
+    initializeHighlighter()
+  }, [])
 
-	function animate() {
-		setCode(`let hi = 'hello'`)
-	}
+  function animate() {
+    setCode(`let hi = 'hello'`)
+  }
 
-	return (
-		<div>
-			{highlighter && (
-				<>
-					<ShikiMagicMove
-						lang="ts"
-						theme="nord"
-						highlighter={highlighter}
-						code={code}
-						options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
-					/>
-					<button onClick={animate}>Animate</button>
-				</>
-			)}
-		</div>
-	)
+  return (
+    <div>
+      {highlighter && (
+        <>
+          <ShikiMagicMove
+            lang="ts"
+            theme="nord"
+            highlighter={highlighter}
+            code={code}
+            options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
+          />
+          <button onClick={animate}>Animate</button>
+        </>
+      )}
+    </div>
+  )
 }
 ```
 
@@ -120,33 +122,33 @@ function App() {
 Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
 ```svelte
-<script lang="ts">
-	import { ShikiMagicMove } from 'shiki-magic-move/svelte'
-	import { getHighlighter } from 'shiki'
+<script lang='ts'>
+  import { ShikiMagicMove } from 'shiki-magic-move/svelte'
+  import { getHighlighter } from 'shiki'
 
-	import 'shiki-magic-move/dist/style.css'
+  import 'shiki-magic-move/dist/style.css'
 
-	let highlighter = getHighlighter({
-		themes: ['nord'],
-		langs: ['javascript', 'typescript'],
-	})
+  const highlighter = getHighlighter({
+    themes: ['nord'],
+    langs: ['javascript', 'typescript'],
+  })
 
-	let code = $state(`const hello = 'world'`)
+  let code = $state(`const hello = 'world'`)
 
-	function animate() {
-		code = `let hi = 'hello'`
-	}
+  function animate() {
+    code = `let hi = 'hello'`
+  }
 </script>
 
 {#await highlighter then highlighter}
-	<ShikiMagicMove
-		lang="ts"
-		theme="nord"
-		{highlighter}
-		{code}
-		options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
-	/>
-	<button onclick={animate}>Animate</button>
+  <ShikiMagicMove
+    lang='ts'
+    theme='nord'
+    {highlighter}
+    {code}
+    options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
+  />
+  <button onclick={animate}>Animate</button>
 {/await}
 ```
 
