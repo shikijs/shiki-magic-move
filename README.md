@@ -8,8 +8,6 @@
 
 Smoothly animated code blocks with Shiki. [Online Demo](https://shiki-magic-move.netlify.app/).
 
-## About Shiki Magic Move
-
 Shiki Magic Move is a low-level library for animating code blocks, and uses [Shiki](https://shiki.style/) as the syntax highlighter. You usually want to use it with a high-level integration like [Slidev](https://sli.dev/guide/syntax#shiki-magic-move).
 
 At the core of the `shiki-magic-move` package is a framework-agnostic [core](./src/core.ts), and [renderer](./src/renderer.ts) — there are also framework wrappers for [Vue](./src/vue), [React](./src/react), and [Svelte](./src/svelte).
@@ -30,7 +28,9 @@ You're going to need Shiki Magic Move for animating the code blocks, and Shiki f
 npm i shiki-magic-move shiki
 ```
 
-## Usage With Vue
+## Usage
+
+### Vue
 
 Import `shiki-magic-move/vue`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
@@ -68,7 +68,7 @@ function animate() {
 </template>
 ```
 
-## Usage With React
+### React
 
 Import `shiki-magic-move/react`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
@@ -117,7 +117,7 @@ function App() {
 }
 ```
 
-## Usage With Svelte
+### Svelte
 
 Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
@@ -152,7 +152,7 @@ Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `Shik
 {/await}
 ```
 
-### Using a Precompiled Step That Doesn't Require Shiki
+### `ShikiMagicMovePrecompiled`
 
 `ShikiMagicMovePrecompiled` is a lighter version of `ShikiMagicMove` that doesn't require Shiki. It's useful when you want to animate the compiled tokens directly. For example, in Vue:
 
@@ -208,7 +208,7 @@ const compiledSteps = codeSteps.map(code => machine.commit(code).current)
 // If you do this on server-side or build-time, you can serialize `compiledSteps` into JSON
 ```
 
-## How Does Shiki Magic Move Work
+## How it works
 
 You can read [The Magic In Shiki Magic Move](https://antfu.me/posts/shiki-magic-move) to understand how Shiki Magic Move works.
 
