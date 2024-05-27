@@ -149,7 +149,7 @@ function commit() {
 let timer: ReturnType<typeof setTimeout> | undefined
 
 watch(
-  [theme, lang, code, duration, stagger, lineNumbers, rendererContainer, highlighter],
+  [theme, lang, code, duration, stagger, lineNumbers, rendererContainer, highlighter, loadingPromise],
   (n, o) => {
     if (n.every((v, i) => v === o[i]))
       return
