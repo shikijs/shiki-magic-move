@@ -137,26 +137,26 @@ export class MagicMoveRenderer {
   }
 
   private registerTransitionEnd(el: HTMLElement, cb: () => void) {
-    let resolved = false
-    let resolve = () => { }
-    const promise = new Promise<void>((_resolve) => {
-      const finish = (e: TransitionEvent) => {
-        if (!e || e.target !== el)
-          return
-        resolve()
-      }
-      resolve = () => {
-        if (resolved)
-          return
-        resolved = true
-        el.removeEventListener('transitionend', finish)
-        cb()
-        _resolve()
-      }
-      el.addEventListener('transitionend', finish)
-    }) as PromiseWithResolve<void>
-    promise.resolve = resolve
-    return promise
+    return () => {
+      let resolved = false
+      let resolve = () => { }
+      const promise = Promise.race([
+        // wait for the finish of all animation and transitions on this element then invoke the callback
+        Promise.allSettled(el.getAnimations().map(animation => animation.finished)).then(() => cb()),
+        // race it with another promise so it's still resolvable separately
+        new Promise<void>((_resolve) => {
+          resolve = () => {
+            if (resolved)
+              return
+            resolved = true
+            cb()
+            _resolve()
+          }
+        }),
+      ]) as PromiseWithResolve
+      promise.resolve = resolve
+      return promise
+    }
   }
 
   setCssVariables() {
@@ -213,7 +213,7 @@ export class MagicMoveRenderer {
     const move: HTMLElement[] = []
     const enter: HTMLElement[] = []
     const leave: HTMLElement[] = []
-    const promises: PromiseWithResolve[] = []
+    const promises: (() => PromiseWithResolve)[] = []
 
     this.previousPromises.forEach(p => p.resolve())
     this.previousPromises = []
@@ -409,10 +409,13 @@ export class MagicMoveRenderer {
     forceReflow()
 
     postReflow.forEach(cb => cb())
+    // we need to call the functions that return the promises after the reflow
+    // to to allow getAnimations to have the correct transitions
+    const actualPromises = promises.map(promise => promise())
 
     this.isFirstRender = false
-    this.previousPromises = promises
-    return Promise.all(promises).then()
+    this.previousPromises = actualPromises
+    return Promise.all(actualPromises).then()
   }
 }
 
