@@ -107,56 +107,27 @@ export class MagicMoveRenderer {
     this.applyNodeStyle(this.container, step)
   }
 
-  private checkContainerStyleChanged(step: KeyedTokensInfo) {
-    if (!this.options.containerStyle)
-      return false
-
-    // we need to clone the node and apply the properties because
-    // if you set the style of backgroundColor=#ffffff and try to access it via
-    // element.style.backgroundColor you get back rgb(255, 255, 255);
-    // this should also be true for other css properties so better be safe than sorry
-    const cloned = this.container.cloneNode() as HTMLElement
-
-    this.applyNodeStyle(cloned, step)
-
-    const bg = cloned.style.backgroundColor !== this.container.style.backgroundColor
-    const fg = cloned.style.color !== this.container.style.color
-    let rootStyle = false
-    if (step.rootStyle) {
-      const items = step.rootStyle.split(';')
-      for (const item of items) {
-        const [key, value] = item.split(':')
-        if (key && value) {
-          rootStyle = rootStyle || this.container.style.getPropertyValue(key.trim()) !== cloned.style.getPropertyValue(key.trim())
-          if (rootStyle)
-            break
-        }
-      }
-    }
-    return bg || fg || rootStyle
-  }
-
   private registerTransitionEnd(el: HTMLElement, cb: () => void) {
-    let resolved = false
-    let resolve = () => { }
-    const promise = new Promise<void>((_resolve) => {
-      const finish = (e: TransitionEvent) => {
-        if (!e || e.target !== el)
-          return
-        resolve()
-      }
-      resolve = () => {
-        if (resolved)
-          return
-        resolved = true
-        el.removeEventListener('transitionend', finish)
-        cb()
-        _resolve()
-      }
-      el.addEventListener('transitionend', finish)
-    }) as PromiseWithResolve<void>
-    promise.resolve = resolve
-    return promise
+    return () => {
+      let resolved = false
+      let resolve = () => { }
+      const promise = Promise.race([
+        // wait for the finish of all animation and transitions on this element then invoke the callback
+        Promise.allSettled(el.getAnimations().map(animation => animation.finished)).then(() => cb()),
+        // race it with another promise so it's still resolvable separately
+        new Promise<void>((_resolve) => {
+          resolve = () => {
+            if (resolved)
+              return
+            resolved = true
+            cb()
+            _resolve()
+          }
+        }),
+      ]) as PromiseWithResolve
+      promise.resolve = resolve
+      return promise
+    }
   }
 
   setCssVariables() {
@@ -213,7 +184,7 @@ export class MagicMoveRenderer {
     const move: HTMLElement[] = []
     const enter: HTMLElement[] = []
     const leave: HTMLElement[] = []
-    const promises: PromiseWithResolve[] = []
+    const promises: (() => PromiseWithResolve)[] = []
 
     this.previousPromises.forEach(p => p.resolve())
     this.previousPromises = []
@@ -390,18 +361,16 @@ export class MagicMoveRenderer {
         this.applyContainerStyle(step)
       }
       else {
-        if (this.checkContainerStyleChanged(step)) {
-          postReflow.push(() => {
-            this.container.classList.add(CLASS_CONTAINER_RESTYLE)
-            this.applyContainerStyle(step)
-          })
+        postReflow.push(() => {
+          this.container.classList.add(CLASS_CONTAINER_RESTYLE)
+          this.applyContainerStyle(step)
+        })
 
-          promises.push(
-            this.registerTransitionEnd(this.container, () => {
-              this.container.classList.remove(CLASS_CONTAINER_RESTYLE)
-            }),
-          )
-        }
+        promises.push(
+          this.registerTransitionEnd(this.container, () => {
+            this.container.classList.remove(CLASS_CONTAINER_RESTYLE)
+          }),
+        )
       }
     }
 
@@ -409,10 +378,13 @@ export class MagicMoveRenderer {
     forceReflow()
 
     postReflow.forEach(cb => cb())
+    // we need to call the functions that return the promises after the reflow
+    // to to allow getAnimations to have the correct transitions
+    const actualPromises = promises.map(promise => promise())
 
     this.isFirstRender = false
-    this.previousPromises = promises
-    return Promise.all(promises).then()
+    this.previousPromises = actualPromises
+    return Promise.all(actualPromises).then()
   }
 }
 
