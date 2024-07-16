@@ -5,6 +5,7 @@ import type { KeyedToken, KeyedTokensInfo, MagicMoveDifferOptions, MatchedRanges
 
 export * from './types'
 
+// eslint-disable-next-line ts/no-unsafe-function-type
 type ArgumentsType<F extends Function> = F extends (...args: infer A) => any ? A : never
 
 export function createMagicMoveMachine(
@@ -123,6 +124,7 @@ function splitWhitespaceTokens(tokens: ThemedToken[][]) {
     return line.flatMap((token) => {
       if (token.content.match(/^\s+$/))
         return token
+      // eslint-disable-next-line regexp/no-super-linear-backtracking
       const match = token.content.match(/^(\s*)(.*?)(\s*)$/)
       if (!match)
         return token
@@ -283,7 +285,7 @@ export function syncTokenKeys(
     for (const token of tokensFrom) {
       if (matchedKeys.has(token.key))
         continue
-      if (token.content.length < 3 || !token.content.match(/^[\w\d_-]+$/))
+      if (token.content.length < 3 || !token.content.match(/^[\w-]+$/))
         continue
       const matched = tokensTo.find(t => t.content === token.content && !matchedKeys.has(t.key))
       if (matched) {
