@@ -13,6 +13,7 @@ export interface ShikiMagicMoveProps {
   onStart?: () => void
   onEnd?: () => void
   className?: string
+  tabindex?: number
 }
 
 export function ShikiMagicMove(props: ShikiMagicMoveProps) {
@@ -44,6 +45,7 @@ export function ShikiMagicMove(props: ShikiMagicMoveProps) {
       ) {
         return machine.current!
       }
+
       return machine.current!.commit(props.code, props.options)
     },
     [props.code, props.options, props.theme, props.lang, lineNumbers],
