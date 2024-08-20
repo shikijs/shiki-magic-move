@@ -13,4 +13,6 @@ export default antfu({
   .overrideRules({
     // Not compatible with ESLint 9 yet
     'react-hooks/exhaustive-deps': 'off',
+    // Not sure why but it seems buggy
+    'svelte/mustache-spacing': 'off',
   })
