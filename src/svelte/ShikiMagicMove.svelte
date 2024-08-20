@@ -13,6 +13,7 @@
     onStart?: () => void
     onEnd?: () => void
     class?: string
+    tabindex?: number
   }
 
   const { highlighter, lang, theme, code, options, onStart, onEnd, ...props }: ShikiMagicMoveProps = $props()
