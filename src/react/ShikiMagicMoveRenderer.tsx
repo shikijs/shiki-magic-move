@@ -87,7 +87,9 @@ export function ShikiMagicMoveRenderer(
             return (
               <span
                 style={{
-                  ...createCSSPropertiesFromString(token.htmlStyle),
+                  ...typeof token.htmlStyle === 'string'
+                    ? createCSSPropertiesFromString(token.htmlStyle)
+                    : token.htmlStyle,
                   color: token.color,
                 }}
                 className={['shiki-magic-move-item', token.htmlClass].filter(Boolean).join(' ')}
