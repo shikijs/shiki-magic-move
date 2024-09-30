@@ -1,7 +1,7 @@
 import * as React from 'react'
 import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
 import { MagicMoveRenderer as Renderer } from '../renderer'
-import { createCSSPropertiesFromString } from './utils'
+import { normalizeCSSProperties } from './utils'
 
 export interface ShikiMagicMoveRendererProps {
   animate?: boolean
@@ -87,9 +87,7 @@ export function ShikiMagicMoveRenderer(
             return (
               <span
                 style={{
-                  ...typeof token.htmlStyle === 'string'
-                    ? createCSSPropertiesFromString(token.htmlStyle)
-                    : token.htmlStyle,
+                  ...normalizeCSSProperties(token.htmlStyle),
                   color: token.color,
                 }}
                 className={['shiki-magic-move-item', token.htmlClass].filter(Boolean).join(' ')}
