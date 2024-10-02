@@ -8,6 +8,7 @@ export default defineBuildConfig({
     'src/react',
     'src/core',
     'src/types',
+    'src/solid',
     'src/renderer',
     {
       builder: 'mkdist',

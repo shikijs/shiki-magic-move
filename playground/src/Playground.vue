@@ -8,6 +8,7 @@ import { toRefs, useLocalStorage } from '@vueuse/core'
 import { vueAfter, vueBefore } from './fixture'
 import { createRendererVue } from './renderer/vue'
 import { createRendererReact } from './renderer/react'
+import { createRendererSolid } from './renderer/solid'
 import { createRendererSvelte } from './renderer/svelte.svelte'
 import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 
@@ -100,6 +101,9 @@ function rendererUpdate() {
         break
       case 'react':
         renderer = createRendererReact(rendererOptions)
+        break
+      case 'solid':
+        renderer = createRendererSolid(rendererOptions)
         break
       case 'svelte':
         renderer = createRendererSvelte(rendererOptions)
@@ -313,6 +317,9 @@ watch(
             </option>
             <option value="react">
               React Renderer
+            </option>
+            <option value="solid">
+              Solid Renderer
             </option>
             <option value="svelte">
               Svelte Renderer
