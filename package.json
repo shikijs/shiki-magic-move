@@ -129,7 +129,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
-    "shiki": "^1.14.1",
+    "shiki": "^1.21.0",
     "simple-git-hooks": "^2.11.1",
     "svelte": "5.0.0-next.107",
     "typescript": "^5.5.4",
