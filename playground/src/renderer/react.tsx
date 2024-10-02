@@ -1,10 +1,10 @@
+import type { Root } from 'react-dom/client'
+import type { RendererFactory, RendererFactoryResult } from './types'
 /* eslint-disable no-console */
 import React from 'react'
-import type { Root } from 'react-dom/client'
 import ReactDOM from 'react-dom/client'
 import { shallowReactive, watch } from 'vue'
 import { ShikiMagicMove } from '../../../src/react'
-import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererReact: RendererFactory = (options): RendererFactoryResult => {
   let app: Root | undefined

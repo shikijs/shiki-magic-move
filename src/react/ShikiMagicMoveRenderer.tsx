@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
+import * as React from 'react'
 import { MagicMoveRenderer as Renderer } from '../renderer'
 import { normalizeCSSProperties } from './utils'
 

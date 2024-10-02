@@ -1,7 +1,7 @@
 import type { App } from 'vue'
+import type { RendererFactory, RendererFactoryResult } from './types'
 import { createApp, h, reactive } from 'vue'
 import { ShikiMagicMove } from '../../../src/vue'
-import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererVue: RendererFactory = (options): RendererFactoryResult => {
   let app: App | undefined

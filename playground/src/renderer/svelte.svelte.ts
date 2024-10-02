@@ -1,6 +1,6 @@
+import type { RendererFactory, RendererFactoryResult } from './types'
 import { mount, unmount } from 'svelte'
 import { ShikiMagicMove } from '../../../src/svelte'
-import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererSvelte: RendererFactory = (options): RendererFactoryResult => {
   let app: any

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { Highlighter } from 'shiki'
-import { getHighlighter } from 'shiki'
-import { bundledThemesInfo } from 'shiki/themes'
-import { bundledLanguagesInfo } from 'shiki/langs'
-import { ref, shallowRef, watch } from 'vue'
+import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 import { toRefs, useLocalStorage } from '@vueuse/core'
+import { getHighlighter } from 'shiki'
+import { bundledLanguagesInfo } from 'shiki/langs'
+import { bundledThemesInfo } from 'shiki/themes'
+import { ref, shallowRef, watch } from 'vue'
 import { vueAfter, vueBefore } from './fixture'
-import { createRendererVue } from './renderer/vue'
 import { createRendererReact } from './renderer/react'
 import { createRendererSvelte } from './renderer/svelte.svelte'
-import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
+import { createRendererVue } from './renderer/vue'
 
 const defaultOptions = {
   theme: 'vitesse-dark',

@@ -1,8 +1,8 @@
 import type { HighlighterCore } from 'shiki/core'
 import type { PropType } from 'vue'
+import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { computed, defineComponent, h } from 'vue'
 import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
-import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 export const ShikiMagicMove = /* #__PURE__ */ defineComponent({

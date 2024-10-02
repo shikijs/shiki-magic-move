@@ -1,8 +1,8 @@
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+import { svelte as Svelte } from '@sveltejs/vite-plugin-svelte'
 import Vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
-import { svelte as Svelte } from '@sveltejs/vite-plugin-svelte'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: {

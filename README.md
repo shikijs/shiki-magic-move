@@ -36,8 +36,8 @@ Import `shiki-magic-move/vue`, and pass the highlighter instance to the `ShikiMa
 
 ```vue
 <script setup>
-import { ShikiMagicMove } from 'shiki-magic-move/vue'
 import { getHighlighter } from 'shiki'
+import { ShikiMagicMove } from 'shiki-magic-move/vue'
 import { ref } from 'vue'
 
 import 'shiki-magic-move/dist/style.css'
@@ -74,8 +74,8 @@ Import `shiki-magic-move/react`, and pass the highlighter instance to the `Shiki
 
 ```tsx
 import { useEffect, useState } from 'react'
+import { getHighlighter, type HighlighterCore } from 'shiki'
 import { ShikiMagicMove } from 'shiki-magic-move/react'
-import { type HighlighterCore, getHighlighter } from 'shiki'
 
 import 'shiki-magic-move/dist/style.css'
 
@@ -123,8 +123,8 @@ Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `Shik
 
 ```svelte
 <script lang='ts'>
-  import { ShikiMagicMove } from 'shiki-magic-move/svelte'
   import { getHighlighter } from 'shiki'
+  import { ShikiMagicMove } from 'shiki-magic-move/svelte'
 
   import 'shiki-magic-move/dist/style.css'
 
@@ -179,8 +179,8 @@ const compiledSteps = [/* Compiled token steps */]
 To get the compiled tokens, you can run this somewhere else and serialize them into the component:
 
 ```ts
-import { codeToKeyedTokens, createMagicMoveMachine } from 'shiki-magic-move/core'
 import { getHighlighter } from 'shiki'
+import { codeToKeyedTokens, createMagicMoveMachine } from 'shiki-magic-move/core'
 
 const shiki = await getHighlighter({
   theme: 'nord',
