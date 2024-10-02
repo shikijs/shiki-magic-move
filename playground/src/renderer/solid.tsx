@@ -29,23 +29,22 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
     return <ShikiMagicMove {...props} class={props.class} />
   }
 
+  let dispose = () => {}
+
   return {
     mount: (element, payload) => {
       Object.assign(props, payload)
-      console.log({ element })
-      render(
+      dispose = render(
         () => <App />,
         element,
       )
-
-      console.log('Solid renderer mounted')
     },
 
     update: (payload) => {
       Object.assign(props, payload)
     },
     dispose: () => {
-      console.log('Solid renderer disposed')
+      dispose?.()
     },
   }
 }
