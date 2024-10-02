@@ -1,5 +1,4 @@
 /** @jsxImportSource solid-js */
-/** @jsx "h" */
 /* eslint-disable no-console */
 import { shallowReactive, watch } from 'vue'
 import { createEffect, createSignal } from 'solid-js'

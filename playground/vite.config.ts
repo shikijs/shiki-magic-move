@@ -4,6 +4,7 @@ import Vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
 import { svelte as Svelte } from '@sveltejs/vite-plugin-svelte'
 import Solid from 'vite-plugin-solid'
+import React from '@vitejs/plugin-react'
 
 export default defineConfig({
   resolve: {
@@ -16,7 +17,7 @@ export default defineConfig({
     Vue(),
     UnoCSS(),
     Svelte(),
-    Solid({ include: ['*/solid/*.tsx', 'solid.tsx'] }),
-    // React({ exclude: 'solid/solid.tsx' }),
+    Solid({ include: ['src/renderer/solid.tsx', '../src/solid/**'] }),
+    React({ include: ['src/renderer/react.tsx', '../src/react/**'] }),
   ],
 })
