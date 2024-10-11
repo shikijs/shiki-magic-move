@@ -1,7 +1,7 @@
-import * as React from 'react'
 import type { HighlighterCore } from 'shiki/core'
-import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
 import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
+import * as React from 'react'
+import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 export interface ShikiMagicMoveProps {

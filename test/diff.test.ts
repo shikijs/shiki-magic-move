@@ -1,6 +1,6 @@
-import { expect, it } from 'vitest'
-import { getHighlighter } from 'shiki/bundle/web'
 import type { KeyedTokensInfo } from '../src/types'
+import { getHighlighter } from 'shiki/bundle/web'
+import { expect, it } from 'vitest'
 import { codeToKeyedTokens, syncTokenKeys } from '../src/core'
 
 it('diff1', async () => {
@@ -243,7 +243,8 @@ it('diff3 enhanceMatching', async () => {
   }).to
 
   expect(printDiff(tokens2WithoutEnhance, originKeys2))
-    .not.toEqual(printDiff(tokens2WithEnhance, originKeys2))
+    .not
+    .toEqual(printDiff(tokens2WithEnhance, originKeys2))
 
   expect(printDiff(tokens2WithEnhance, originKeys2)).toMatchInlineSnapshot(`
     "

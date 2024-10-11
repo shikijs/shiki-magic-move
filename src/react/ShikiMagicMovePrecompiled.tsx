@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
+import * as React from 'react'
 import { syncTokenKeys, toKeyedTokens } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 

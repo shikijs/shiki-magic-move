@@ -1,6 +1,6 @@
 <script lang='ts'>
-  import { MagicMoveRenderer } from 'shiki-magic-move/renderer'
   import type { KeyedTokensInfo, MagicMoveRenderOptions } from 'shiki-magic-move/types'
+  import { MagicMoveRenderer } from 'shiki-magic-move/renderer'
 
   interface ShikiMagicMoveRendererProps {
     class?: string

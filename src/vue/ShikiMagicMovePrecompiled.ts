@@ -1,6 +1,6 @@
 import type { PropType } from 'vue'
-import { computed, defineComponent, h } from 'vue'
 import type { KeyedTokensInfo, MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
+import { computed, defineComponent, h } from 'vue'
 import { syncTokenKeys, toKeyedTokens } from '../core'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 

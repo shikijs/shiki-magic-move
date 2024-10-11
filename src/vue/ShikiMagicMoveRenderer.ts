@@ -1,6 +1,6 @@
 import type { PropType } from 'vue'
-import { defineComponent, h, nextTick, onMounted, ref, renderList, watch } from 'vue'
 import type { KeyedTokensInfo, MagicMoveRenderOptions } from '../types'
+import { defineComponent, h, nextTick, onMounted, ref, renderList, watch } from 'vue'
 import { MagicMoveRenderer as Renderer } from '../renderer'
 
 /**
