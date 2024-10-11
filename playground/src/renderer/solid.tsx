@@ -1,5 +1,5 @@
 /** @jsxImportSource solid-js */
-/* eslint-disable no-console */
+
 import { shallowReactive, watch } from 'vue'
 import { createEffect, createSignal } from 'solid-js'
 import { render } from 'solid-js/web'
@@ -13,20 +13,35 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
   })
 
   function App() {
-    // TODO: make Solid not render twice
-    const [count, setCounter] = createSignal(0)
+    const [code, setCode] = createSignal(props.code as string)
+    const [highlighter, setHighlighter] = createSignal(props.highlighter)
+    const [lang, setLang] = createSignal(props.lang)
+    const [theme, setTheme] = createSignal(props.theme)
+    const [className, setClassName] = createSignal(props.class)
 
     createEffect(() => {
-      console.log('Solid effect')
       watch(props, () => {
         // Force Solid to re-render
-        setCounter(c => c + 1)
+        setCode(props.code)
+        setHighlighter(props.highlighter)
+        setLang(props.lang)
+        setTheme(props.theme)
+        setClassName(props.class)
       })
     })
 
-    console.log('Solid rendering', count())
-
-    return <ShikiMagicMove {...props} class={props.class} />
+    return (
+      <>
+        <ShikiMagicMove
+          highlighter={highlighter()}
+          code={code()}
+          class={className()}
+          lang={lang()}
+          theme={theme()}
+          options={props.options}
+        />
+      </>
+    )
   }
 
   let dispose = () => {}

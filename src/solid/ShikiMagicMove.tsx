@@ -19,37 +19,34 @@ export interface ShikiMagicMoveProps {
 }
 
 export function ShikiMagicMove(props: ShikiMagicMoveProps) {
-  const codeToTokens = (code: string, lineNumbers?: boolean) => codeToKeyedTokens(
-    props.highlighter,
-    code,
-    {
-      lang: props.lang,
-      theme: props.theme,
-    },
-    lineNumbers,
+  const codeToTokens = (code: string, lineNumbers?: boolean) =>
+    codeToKeyedTokens(
+      props.highlighter,
+      code,
+      {
+        lang: props.lang,
+        theme: props.theme,
+      },
+      lineNumbers,
+    )
+
+  const machine = createMagicMoveMachine((code, lineNumbers) =>
+    codeToTokens(code, lineNumbers),
   )
 
-  const machine = createMagicMoveMachine(
-    (code, lineNumbers) => codeToTokens(code, lineNumbers),
-  )
+  const result = createMemo(() => {
+    const lineNumbers = props.options?.lineNumbers ?? false
+    if (
+      props.code === machine.current.code
+      && props.theme === machine.current.themeName
+      && props.lang === machine.current.lang
+      && lineNumbers === machine.current.lineNumbers
+    ) {
+      return machine
+    }
 
-  const lineNumbers = props.options?.lineNumbers ?? false
-
-  const result = createMemo(
-    () => {
-      if (
-        props.code === machine.current.code
-        && props.theme === machine.current.themeName
-        && props.lang === machine.current.lang
-        && lineNumbers === machine.current.lineNumbers
-      ) {
-        return machine
-      }
-
-      return machine.commit(props.code, props.options)
-    },
-    [props.code, props.options, props.theme, props.lang, lineNumbers],
-  )
+    return machine.commit(props.code, props.options)
+  })
 
   return (
     <ShikiMagicMoveRenderer

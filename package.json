@@ -91,6 +91,7 @@
   "peerDependencies": {
     "react": "^18.2.0",
     "shiki": "^1.1.6",
+    "solid-js": "^1.9.1",
     "svelte": "5.0.0-next.107",
     "vue": "^3.4.0"
   },
@@ -99,6 +100,9 @@
       "optional": true
     },
     "shiki": {
+      "optional": true
+    },
+    "solid-js": {
       "optional": true
     },
     "svelte": {
@@ -110,8 +114,7 @@
   },
   "dependencies": {
     "diff-match-patch-es": "^0.1.0",
-    "ohash": "^1.1.3",
-    "solid-js": "^1.9.1"
+    "ohash": "^1.1.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^2.26.0",
@@ -143,6 +146,7 @@
     "rimraf": "^6.0.1",
     "shiki": "^1.14.1",
     "simple-git-hooks": "^2.11.1",
+    "solid-js": "^1.9.1",
     "svelte": "5.0.0-next.107",
     "typescript": "^5.5.4",
     "unbuild": "^2.0.0",
