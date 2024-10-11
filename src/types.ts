@@ -86,6 +86,13 @@ export interface MagicMoveRenderOptions {
    * @default 0
    */
   stagger?: number
+
+  /**
+   * Output the elements that are being animated with their starting and ending values
+   *
+   * @default () => {}
+   */
+  onAnimationStart?: (elements: MagicMoveElement[], container: { height: number, width: number }) => void
 }
 
 export interface MagicMoveDifferOptions {
@@ -109,4 +116,24 @@ export interface MagicMoveDifferOptions {
    * Enhance the matching algorithm to match tokens that has same content
    */
   enhanceMatching?: boolean
+}
+
+export interface MagicMoveElement {
+  el: HTMLElement
+  x: {
+    start: number
+    end: number
+  }
+  y: {
+    start: number
+    end: number
+  }
+  color: {
+    start: string
+    end: string
+  }
+  opacity: {
+    start: number
+    end: number
+  }
 }

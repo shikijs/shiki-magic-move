@@ -1,4 +1,4 @@
-import type { KeyedToken, KeyedTokensInfo, MagicMoveRenderOptions } from './types'
+import type { KeyedToken, KeyedTokensInfo, MagicMoveElement, MagicMoveRenderOptions } from './types'
 
 const CLASS_PREFIX = 'shiki-magic-move'
 const CLASS_LEAVE_FROM = `${CLASS_PREFIX}-leave-from`
@@ -26,6 +26,7 @@ export const defaultOptions: Required<MagicMoveRenderOptions> = {
   easing: 'ease',
   animateContainer: true,
   containerStyle: true,
+  onAnimationStart: () => {},
 }
 
 export class MagicMoveRenderer {
@@ -193,6 +194,8 @@ export class MagicMoveRenderer {
     const enter: HTMLElement[] = []
     const leave: HTMLElement[] = []
     const promises: (() => PromiseWithResolve)[] = []
+    const magicMoveElements: MagicMoveElement[] = []
+    const maxContainerDimensions = { width: 0, height: 0 }
 
     this.previousPromises.forEach(p => p.resolve())
     this.previousPromises = []
@@ -206,6 +209,7 @@ export class MagicMoveRenderer {
 
     // Record the current position of the elements (before rerendering)
     const position = new Map<HTMLElement, { x: number, y: number }>()
+    const newColor = new Map<HTMLElement, string>()
     let anchorRect = this.anchor.getBoundingClientRect()
     const containerRect = this.container.getBoundingClientRect()
     for (const el of this.mapDom.values()) {
@@ -217,6 +221,7 @@ export class MagicMoveRenderer {
       if (this.mapDom.has(token.key)) {
         const el = this.mapDom.get(token.key)!
         this.applyElementContent(el, token)
+        newColor.set(el, token.color || el.style.color)
         postReflow.push(() => {
           // Update color and style after reflow
           this.applyElementStyle(el, token)
@@ -228,6 +233,7 @@ export class MagicMoveRenderer {
       }
       else {
         const el = document.createElement(token.content === '\n' ? 'br' : 'span')
+        newColor.set(el, token.color || el.style.color)
         this.applyElement(el, token)
         enter.push(el)
         newDomMap.set(token.key, el)
@@ -260,6 +266,26 @@ export class MagicMoveRenderer {
       el.style.top = `${pos.y / scale}px`
       el.style.left = `${pos.x / scale}px`
 
+      magicMoveElements.push({
+        el,
+        x: {
+          start: pos.x,
+          end: pos.x,
+        },
+        y: {
+          start: pos.y,
+          end: pos.y,
+        },
+        color: {
+          start: el.style.color,
+          end: el.style.color,
+        },
+        opacity: {
+          start: 1,
+          end: 0,
+        },
+      })
+
       if (this.options.stagger)
         el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
       else
@@ -288,6 +314,29 @@ export class MagicMoveRenderer {
       enter.forEach((el, idx) => {
         el.classList.add(CLASS_ENTER_FROM)
         el.classList.add(CLASS_ENTER_ACTIVE)
+
+        const elRect = el.getBoundingClientRect()
+        const pos = { x: elRect.x - anchorRect.x, y: elRect.y - anchorRect.y }
+
+        magicMoveElements.push({
+          el,
+          x: {
+            start: pos.x,
+            end: pos.x,
+          },
+          y: {
+            start: pos.y,
+            end: pos.y,
+          },
+          color: {
+            start: newColor.get(el)!,
+            end: newColor.get(el)!,
+          },
+          opacity: {
+            start: 0,
+            end: 1,
+          },
+        })
 
         if (this.options.stagger)
           el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
@@ -322,6 +371,26 @@ export class MagicMoveRenderer {
       const dy = (oldPos.y - newPos.y) / scale
       el.style.transform = `translate(${dx}px, ${dy}px)`
 
+      magicMoveElements.push({
+        el,
+        x: {
+          start: oldPos.x,
+          end: newPos.x,
+        },
+        y: {
+          start: oldPos.y,
+          end: newPos.y,
+        },
+        color: {
+          start: el.style.color,
+          end: newColor.get(el)!,
+        },
+        opacity: {
+          start: 1,
+          end: 1,
+        },
+      })
+
       if (this.options.stagger)
         el.style.setProperty('--smm-stagger', `${idx * this.options.stagger}ms`)
       else
@@ -353,6 +422,9 @@ export class MagicMoveRenderer {
           this.container.style.transitionDuration = this.container.style.transitionDelay = ''
           this.container.style.height = `${newRect.height / scale}px`
           this.container.style.width = `${newRect.width / scale}px`
+
+          maxContainerDimensions.width = Math.max(containerRect.width / scale, newRect.width / scale)
+          maxContainerDimensions.height = Math.max(containerRect.height / scale, newRect.height / scale)
         })
 
         promises.push(
@@ -389,6 +461,8 @@ export class MagicMoveRenderer {
     // we need to call the functions that return the promises after the reflow
     // to to allow getAnimations to have the correct transitions
     const actualPromises = promises.map(promise => promise())
+
+    this.options.onAnimationStart(magicMoveElements, maxContainerDimensions)
 
     this.isFirstRender = false
     this.previousPromises = actualPromises
