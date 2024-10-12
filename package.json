@@ -144,6 +144,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
+    "rollup": "^4.24.0",
     "shiki": "^1.21.0",
     "simple-git-hooks": "^2.11.1",
     "solid-js": "^1.9.1",
