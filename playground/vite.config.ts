@@ -1,8 +1,10 @@
 import { fileURLToPath } from 'node:url'
 import { svelte as Svelte } from '@sveltejs/vite-plugin-svelte'
+import React from '@vitejs/plugin-react'
 import Vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
 import { defineConfig } from 'vite'
+import Solid from 'vite-plugin-solid'
 
 export default defineConfig({
   resolve: {
@@ -15,5 +17,7 @@ export default defineConfig({
     Vue(),
     UnoCSS(),
     Svelte(),
+    Solid({ include: ['src/renderer/solid.tsx', '../src/solid/**'] }),
+    React({ include: ['src/renderer/react.tsx', '../src/react/**'] }),
   ],
 })
