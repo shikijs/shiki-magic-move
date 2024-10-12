@@ -1,10 +1,10 @@
 /** @jsxImportSource solid-js */
 
-import { shallowReactive, watch } from 'vue'
+import type { RendererFactory, RendererFactoryResult } from './types'
 import { createEffect, createSignal } from 'solid-js'
 import { render } from 'solid-js/web'
+import { shallowReactive, watch } from 'vue'
 import { ShikiMagicMove } from '../../../src/solid'
-import type { RendererFactory, RendererFactoryResult } from './types'
 
 export const createRendererSolid: RendererFactory = (options): RendererFactoryResult => {
   const props = shallowReactive<any>({

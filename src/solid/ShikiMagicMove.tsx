@@ -1,9 +1,9 @@
 /** @jsxImportSource solid-js */
 
 import type { HighlighterCore } from 'shiki/core'
+import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { createMemo } from 'solid-js'
 import { codeToKeyedTokens, createMagicMoveMachine } from '../core'
-import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../types'
 import { ShikiMagicMoveRenderer } from './ShikiMagicMoveRenderer'
 
 export interface ShikiMagicMoveProps {
