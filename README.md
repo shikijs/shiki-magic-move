@@ -130,7 +130,6 @@ import 'shiki-magic-move/dist/style.css'
 
 function App() {
   const [code, setCode] = createSignal(`const hello = 'world'`)
-  const [highlighter, setHighlighter] = useState<HighlighterCore>()
 
   const [highlighter] = createResource(async () => {
     const newHighlighter = await createHighlighter({
