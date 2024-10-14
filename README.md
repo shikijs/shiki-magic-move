@@ -117,6 +117,54 @@ function App() {
 }
 ```
 
+### Solid
+
+Import `shiki-magic-move/solid`, and pass the highlighter instance to the `ShikiMagicMove` component.
+
+```tsx
+import { getHighlighter, type HighlighterCore } from 'shiki'
+import { ShikiMagicMove } from 'shiki-magic-move/solid'
+import { createResource, createSignal } from 'solid-js'
+
+import 'shiki-magic-move/dist/style.css'
+
+function App() {
+  const [code, setCode] = createSignal(`const hello = 'world'`)
+
+  const [highlighter] = createResource(async () => {
+    const newHighlighter = await createHighlighter({
+      themes: Object.keys(bundledThemes),
+      langs: Object.keys(bundledLanguages),
+    })
+
+    return newHighlighter
+  })
+
+  function animate() {
+    setCode(`let hi = 'hello'`)
+  }
+
+  return (
+    <div>
+      <Show when={highlighter()}>
+        {highlighter => (
+          <>
+            <ShikiMagicMove
+              lang="ts"
+              theme="nord"
+              highlighter={highlighter()}
+              code={code()}
+              options={{ duration: 800, stagger: 0.3, lineNumbers: true }}
+            />
+            <button onClick={animate}>Animate</button>
+          </>
+        )}
+      </Show>
+    </div>
+  )
+}
+```
+
 ### Svelte
 
 Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `ShikiMagicMove` component.
