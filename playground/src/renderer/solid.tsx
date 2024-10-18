@@ -18,6 +18,7 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
     const [lang, setLang] = createSignal(props.lang)
     const [theme, setTheme] = createSignal(props.theme)
     const [className, setClassName] = createSignal(props.class)
+    const [options, setOptions] = createSignal(props.options)
 
     createEffect(() => {
       watch(props, () => {
@@ -27,6 +28,7 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
         setLang(props.lang)
         setTheme(props.theme)
         setClassName(props.class)
+        setOptions(props.options)
       })
     })
 
@@ -38,7 +40,7 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
           class={className()}
           lang={lang()}
           theme={theme()}
-          options={props.options}
+          options={options()}
         />
       </>
     )
