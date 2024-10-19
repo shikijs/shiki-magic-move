@@ -28,7 +28,7 @@ export const createRendererSolid: RendererFactory = (options): RendererFactoryRe
     },
     dispose: () => {
       if (dispose) {
-        dispose?.()
+        dispose()
         dispose = undefined
       }
     },
