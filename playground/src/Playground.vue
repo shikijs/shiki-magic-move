@@ -7,6 +7,7 @@ import { bundledLanguagesInfo } from 'shiki/langs'
 import { bundledThemesInfo } from 'shiki/themes'
 import { ref, shallowRef, watch } from 'vue'
 import { vueAfter, vueBefore } from './fixture'
+import { createRendererLit } from './renderer/lit'
 import { createRendererReact } from './renderer/react'
 import { createRendererSolid } from './renderer/solid'
 import { createRendererSvelte } from './renderer/svelte.svelte'
@@ -108,6 +109,8 @@ function rendererUpdate() {
       case 'svelte':
         renderer = createRendererSvelte(rendererOptions)
         break
+      case 'lit':
+        renderer = createRendererLit(rendererOptions)
     }
 
     renderer.mount(rendererContainer.value, payload)
@@ -323,6 +326,9 @@ watch(
             </option>
             <option value="svelte">
               Svelte Renderer
+            </option>
+            <option value="lit">
+              Lit Renderer
             </option>
           </select>
         </div>

@@ -89,6 +89,7 @@
     "play:build": "nr -C playground build"
   },
   "peerDependencies": {
+    "lit": "^3.2.1",
     "react": "^18.2.0",
     "shiki": "^1.1.6",
     "solid-js": "^1.9.1",
@@ -140,6 +141,7 @@
     "eslint-plugin-svelte": "^2.44.1",
     "esno": "^4.8.0",
     "lint-staged": "^15.2.10",
+    "lit": "^3.2.1",
     "pnpm": "^9.12.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

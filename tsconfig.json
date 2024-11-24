@@ -3,6 +3,8 @@
     "target": "ESNext",
     "jsx": "preserve",
     "lib": ["ESNext", "DOM"],
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
