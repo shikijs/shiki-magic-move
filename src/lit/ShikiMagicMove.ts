@@ -9,7 +9,7 @@ import './ShikiMagicMoveRenderer'
 @customElement('shiki-magic-move')
 export class ShikiMagicMove extends LitElement {
   @property()
-  highlighter?: HighlighterCore
+  highlighter!: HighlighterCore
 
   @property()
   lang: string = 'typescript'
@@ -53,7 +53,7 @@ export class ShikiMagicMove extends LitElement {
     if (!this.hasUpdated) {
       this.machine = createMagicMoveMachine(
         code => codeToKeyedTokens(
-          this.highlighter as HighlighterCore,
+          this.highlighter,
           code,
           {
             lang: this.lang,

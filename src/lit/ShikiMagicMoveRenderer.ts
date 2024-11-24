@@ -11,7 +11,7 @@ export class ShikiMagicMoveRenderer extends LitElement {
   animated: boolean = true
 
   @property()
-  tokens?: KeyedTokensInfo
+  tokens!: KeyedTokensInfo
 
   @property()
   previous?: KeyedTokensInfo
@@ -37,11 +37,10 @@ export class ShikiMagicMoveRenderer extends LitElement {
         if (this.previous)
           this.renderer.replace(this.previous)
         this.dispatchEvent(new CustomEvent('onStart'))
-        if (this.tokens)
-          await this.renderer?.render(this.tokens)
+        await this.renderer?.render(this.tokens)
         this.dispatchEvent(new CustomEvent('onEnd'))
       }
-      else if (this.tokens) {
+      else {
         this.renderer.replace(this.tokens)
       }
     }
@@ -61,8 +60,7 @@ export class ShikiMagicMoveRenderer extends LitElement {
 
   firstUpdated() {
     this.renderer = new Renderer(this.container.value!)
-    if (this.tokens)
-      this.renderer?.render(this.tokens)
+    this.renderer?.render(this.tokens)
   }
 
   render() {
