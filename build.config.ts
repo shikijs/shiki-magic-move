@@ -11,6 +11,7 @@ export default defineBuildConfig({
     'src/core',
     'src/types',
     'src/solid',
+    'src/lit',
     'src/renderer',
     {
       builder: 'mkdist',
@@ -55,6 +56,13 @@ export default defineBuildConfig({
         include: ['src/react/**'],
         presets: ['@babel/preset-typescript', '@babel/preset-react'],
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      }))
+      plugins.unshift(babel({
+        babelHelpers: 'bundled',
+        include: ['src/lit/**'],
+        presets: ['@babel/preset-typescript'],
+        plugins: [['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }], '@babel/plugin-transform-class-properties'],
+        extensions: ['.ts', '.js'],
       }))
     },
     'mkdist:done': async () => {

@@ -114,6 +114,8 @@
     }
   },
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.25.9",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
     "diff-match-patch-es": "^0.1.0",
     "ohash": "^1.1.4"
   },
