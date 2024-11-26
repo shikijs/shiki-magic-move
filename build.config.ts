@@ -11,6 +11,7 @@ export default defineBuildConfig({
     'src/core',
     'src/types',
     'src/solid',
+    'src/web-component',
     'src/renderer',
     {
       builder: 'mkdist',

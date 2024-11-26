@@ -11,6 +11,7 @@ import { createRendererReact } from './renderer/react'
 import { createRendererSolid } from './renderer/solid'
 import { createRendererSvelte } from './renderer/svelte.svelte'
 import { createRendererVue } from './renderer/vue'
+import { createRendererWebComponent } from './renderer/web-component'
 
 const defaultOptions = {
   theme: 'vitesse-dark',
@@ -107,6 +108,9 @@ function rendererUpdate() {
         break
       case 'svelte':
         renderer = createRendererSvelte(rendererOptions)
+        break
+      case 'web-component':
+        renderer = createRendererWebComponent(rendererOptions)
         break
     }
 
@@ -323,6 +327,9 @@ watch(
             </option>
             <option value="svelte">
               Svelte Renderer
+            </option>
+            <option value="web-component">
+              Web Component Renderer
             </option>
           </select>
         </div>
