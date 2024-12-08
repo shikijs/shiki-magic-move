@@ -1,7 +1,7 @@
 import type { HighlighterCore } from 'shiki/core'
 import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from '../../../src/core'
 
-export type RendererType = 'vue' | 'react' | 'svelte' | 'solid'
+export type RendererType = 'vue' | 'react' | 'svelte' | 'solid' | 'web-component'
 
 export interface RendererUpdatePayload {
   highlighter: HighlighterCore
