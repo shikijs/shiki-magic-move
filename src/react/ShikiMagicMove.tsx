@@ -17,18 +17,19 @@ export interface ShikiMagicMoveProps {
 }
 
 export function ShikiMagicMove(props: ShikiMagicMoveProps) {
-  const codeToTokens = React.useRef<(code: string, lineNumbers?: boolean) => KeyedTokensInfo>()
-  codeToTokens.current = (code, lineNumbers) => codeToKeyedTokens(
-    props.highlighter,
-    code,
-    {
-      lang: props.lang,
-      theme: props.theme,
-    },
-    lineNumbers,
+  const codeToTokens = React.useRef<(code: string, lineNumbers?: boolean) => KeyedTokensInfo>(
+    (code, lineNumbers) => codeToKeyedTokens(
+      props.highlighter,
+      code,
+      {
+        lang: props.lang,
+        theme: props.theme,
+      },
+      lineNumbers,
+    ),
   )
 
-  const machine = React.useRef<ReturnType<typeof createMagicMoveMachine>>()
+  const machine = React.useRef<ReturnType<typeof createMagicMoveMachine>>(null)
   machine.current = machine.current || createMagicMoveMachine(
     (code, lineNumbers) => codeToTokens.current!(code, lineNumbers),
   )

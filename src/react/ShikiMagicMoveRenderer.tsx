@@ -30,7 +30,7 @@ export function ShikiMagicMoveRenderer(
   }: ShikiMagicMoveRendererProps,
 ) {
   const container = React.useRef<HTMLPreElement>(null)
-  const renderer = React.useRef<Renderer>()
+  const renderer = React.useRef<Renderer>(null)
   const [isMounted, setIsMounted] = React.useState(false)
 
   React.useEffect(() => {

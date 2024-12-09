@@ -21,7 +21,7 @@ export interface ShikiMagicMoveRendererProps {
  * A wrapper component to `MagicMoveRenderer`
  */
 export function ShikiMagicMoveRenderer(props: ShikiMagicMoveRendererProps) {
-  let container: HTMLPreElement
+  let container!: HTMLPreElement
   let renderer: Renderer
   const [isMounted, setIsMounted] = createSignal(false)
 
@@ -58,7 +58,6 @@ export function ShikiMagicMoveRenderer(props: ShikiMagicMoveRendererProps) {
 
   return (
     <pre
-      // @ts-expect-error - TS doesn't know that `container` is a ref
       ref={container}
       class={`shiki-magic-move-container ${props.class || ''}`.trim()}
       style={props.style}
