@@ -81,22 +81,22 @@ export function ShikiMagicMoveRenderer(
         {isMounted
           ? undefined
           : tokens.tokens.map((token) => {
-            if (token.content === '\n')
-              return <br key={token.key} />
+              if (token.content === '\n')
+                return <br key={token.key} />
 
-            return (
-              <span
-                style={{
-                  ...normalizeCSSProperties(token.htmlStyle),
-                  color: token.color,
-                }}
-                className={['shiki-magic-move-item', token.htmlClass].filter(Boolean).join(' ')}
-                key={token.key}
-              >
-                {token.content}
-              </span>
-            )
-          })}
+              return (
+                <span
+                  style={{
+                    ...normalizeCSSProperties(token.htmlStyle),
+                    color: token.color,
+                  }}
+                  className={['shiki-magic-move-item', token.htmlClass].filter(Boolean).join(' ')}
+                  key={token.key}
+                >
+                  {token.content}
+                </span>
+              )
+            })}
       </div>
     </pre>
   )

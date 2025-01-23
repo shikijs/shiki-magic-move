@@ -2,7 +2,7 @@
 import type { Highlighter } from 'shiki'
 import type { RendererFactoryOptions, RendererFactoryResult, RendererType, RendererUpdatePayload } from './renderer/types'
 import { toRefs, useLocalStorage } from '@vueuse/core'
-import { getHighlighter } from 'shiki'
+import { createHighlighter } from 'shiki'
 import { bundledLanguagesInfo } from 'shiki/langs'
 import { bundledThemesInfo } from 'shiki/themes'
 import { ref, shallowRef, watch } from 'vue'
@@ -48,7 +48,7 @@ const rendererContainer = ref<HTMLElement>()
 let renderer: RendererFactoryResult
 
 const loadingPromise = shallowRef<Promise<void> | undefined>(
-  getHighlighter({
+  createHighlighter({
     themes: [theme.value],
     langs: [lang.value],
   }).then((h) => {

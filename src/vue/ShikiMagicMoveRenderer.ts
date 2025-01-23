@@ -69,18 +69,18 @@ export const ShikiMagicMoveRenderer = /* #__PURE__ */ defineComponent({
       isMounted
         ? undefined
         : renderList(props.tokens.tokens, (token) => {
-          if (token.content === '\n')
-            return h('br', { key: token.key })
-          return h(
-            'span',
-            {
-              style: [{ color: token.color }, token.htmlStyle],
-              class: ['shiki-magic-move-item', token.htmlClass],
-              key: token.key,
-            },
-            token.content,
-          )
-        }),
+            if (token.content === '\n')
+              return h('br', { key: token.key })
+            return h(
+              'span',
+              {
+                style: [{ color: token.color }, token.htmlStyle],
+                class: ['shiki-magic-move-item', token.htmlClass],
+                key: token.key,
+              },
+              token.content,
+            )
+          }),
     )
   },
 })

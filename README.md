@@ -36,13 +36,13 @@ Import `shiki-magic-move/vue`, and pass the highlighter instance to the `ShikiMa
 
 ```vue
 <script setup>
-import { getHighlighter } from 'shiki'
+import { createHighlighter } from 'shiki'
 import { ShikiMagicMove } from 'shiki-magic-move/vue'
 import { ref } from 'vue'
 
 import 'shiki-magic-move/dist/style.css'
 
-const highlighter = await getHighlighter({
+const highlighter = await createHighlighter({
   themes: ['nord'],
   langs: ['javascript', 'typescript'],
 })
@@ -74,7 +74,7 @@ Import `shiki-magic-move/react`, and pass the highlighter instance to the `Shiki
 
 ```tsx
 import { useEffect, useState } from 'react'
-import { getHighlighter, type HighlighterCore } from 'shiki'
+import { createHighlighter, type HighlighterCore } from 'shiki'
 import { ShikiMagicMove } from 'shiki-magic-move/react'
 
 import 'shiki-magic-move/dist/style.css'
@@ -85,7 +85,7 @@ function App() {
 
   useEffect(() => {
     async function initializeHighlighter() {
-      const highlighter = await getHighlighter({
+      const highlighter = await createHighlighter({
         themes: ['nord'],
         langs: ['javascript', 'typescript'],
       })
@@ -122,7 +122,7 @@ function App() {
 Import `shiki-magic-move/solid`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
 ```tsx
-import { getHighlighter, type HighlighterCore } from 'shiki'
+import { createHighlighter, } from 'shiki'
 import { ShikiMagicMove } from 'shiki-magic-move/solid'
 import { createResource, createSignal } from 'solid-js'
 
@@ -171,12 +171,12 @@ Import `shiki-magic-move/svelte`, and pass the highlighter instance to the `Shik
 
 ```svelte
 <script lang='ts'>
-  import { getHighlighter } from 'shiki'
+  import { createHighlighter } from 'shiki'
   import { ShikiMagicMove } from 'shiki-magic-move/svelte'
 
   import 'shiki-magic-move/dist/style.css'
 
-  const highlighter = getHighlighter({
+  const highlighter = createHighlighter({
     themes: ['nord'],
     langs: ['javascript', 'typescript'],
   })
@@ -227,10 +227,10 @@ const compiledSteps = [/* Compiled token steps */]
 To get the compiled tokens, you can run this somewhere else and serialize them into the component:
 
 ```ts
-import { getHighlighter } from 'shiki'
+import { createHighlighter } from 'shiki'
 import { codeToKeyedTokens, createMagicMoveMachine } from 'shiki-magic-move/core'
 
-const shiki = await getHighlighter({
+const shiki = await createHighlighter({
   theme: 'nord',
   langs: ['javascript', 'typescript'],
 })

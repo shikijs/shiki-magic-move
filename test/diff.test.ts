@@ -1,5 +1,5 @@
 import type { KeyedTokensInfo } from '../src/types'
-import { getHighlighter } from 'shiki/bundle/web'
+import { createHighlighter } from 'shiki/bundle/web'
 import { expect, it } from 'vitest'
 import { codeToKeyedTokens, syncTokenKeys } from '../src/core'
 
@@ -10,7 +10,7 @@ it('diff1', async () => {
 
   const theme = 'vitesse-light'
   const lang = 'js'
-  const highlighter = await getHighlighter({
+  const highlighter = await createHighlighter({
     themes: [theme],
     langs: [lang],
   })
@@ -100,7 +100,7 @@ it('diff2', async () => {
 
   const theme = 'vitesse-light'
   const lang = 'vue'
-  const highlighter = await getHighlighter({
+  const highlighter = await createHighlighter({
     themes: [theme],
     langs: [lang],
   })
@@ -216,7 +216,7 @@ it('diff3 enhanceMatching', async () => {
 
   const theme = 'vitesse-light'
   const lang = 'vue'
-  const highlighter = await getHighlighter({
+  const highlighter = await createHighlighter({
     themes: [theme],
     langs: [lang],
   })
