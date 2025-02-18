@@ -73,8 +73,9 @@ function animate() {
 Import `shiki-magic-move/react`, and pass the highlighter instance to the `ShikiMagicMove` component.
 
 ```tsx
+import type { HighlighterCore } from 'shiki'
 import { useEffect, useState } from 'react'
-import { createHighlighter, type HighlighterCore } from 'shiki'
+import { createHighlighter } from 'shiki'
 import { ShikiMagicMove } from 'shiki-magic-move/react'
 
 import 'shiki-magic-move/dist/style.css'
