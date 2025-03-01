@@ -13,6 +13,9 @@ export default defineConfig({
       'shiki-magic-move/renderer': fileURLToPath(new URL('../src/renderer.ts', import.meta.url)),
     },
   },
+  server: {
+    allowedHosts: true
+  },
   plugins: [
     Vue(),
     UnoCSS(),

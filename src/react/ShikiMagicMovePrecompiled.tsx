@@ -38,7 +38,7 @@ export function ShikiMagicMovePrecompiled(
     )
     setPrevious(res.to)
     return res
-  }, [previous, steps, step, options])
+  }, [steps, step, options])
 
   return (
     <ShikiMagicMoveRenderer
