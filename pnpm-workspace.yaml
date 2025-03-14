@@ -3,3 +3,5 @@ packages:
   - docs
   - packages/*
   - examples/*
+onlyBuiltDependencies:
+  - esbuild
