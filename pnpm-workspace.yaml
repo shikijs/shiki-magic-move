@@ -3,5 +3,11 @@ packages:
   - docs
   - packages/*
   - examples/*
+
+ignoreWorkspaceRootCheck: true
+
 onlyBuiltDependencies:
   - esbuild
+  - simple-git-hooks
+
+shellEmulator: true

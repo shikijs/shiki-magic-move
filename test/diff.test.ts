@@ -23,9 +23,9 @@ it('diff1', async () => {
 
   expect.soft(hashes).toMatchInlineSnapshot(`
     [
-      "hD0HhOdtAP",
-      "L1LlseyEQ5",
-      "oCzzhGXmbP",
+      "ZoOoAmFcnMrXB88ovZ24EUOajikSTYMhYb7O7k1dIqc",
+      "bu5Lf92T8H0PtR79knPh7GRpYga2qb2tfCtzadFkYC0",
+      "JPuZBn162X47pAQY0s_2qeDdn1drzfanZwMxBs0Ha-k",
     ]
   `)
 
