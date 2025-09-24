@@ -69,23 +69,23 @@ export function ShikiMagicMoveRenderer(props: ShikiMagicMoveRendererProps) {
         {isMounted()
           ? undefined
           : props.tokens?.tokens.map((token) => {
-            if (token.content === '\n')
-              return <br />
+              if (token.content === '\n')
+                return <br />
 
-            return (
-              <span
-                style={{
-                  ...normalizeCSSProperties(token.htmlStyle),
-                  color: token.color,
-                }}
-                class={['shiki-magic-move-item', token.htmlClass]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
-                {token.content}
-              </span>
-            )
-          })}
+              return (
+                <span
+                  style={{
+                    ...normalizeCSSProperties(token.htmlStyle),
+                    color: token.color,
+                  }}
+                  class={['shiki-magic-move-item', token.htmlClass]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  {token.content}
+                </span>
+              )
+            })}
       </div>
     </pre>
   )
