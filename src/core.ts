@@ -79,7 +79,7 @@ export function toKeyedTokens(
   const hash = getHash(code + salt)
   let lastOffset = 0
   let firstOffset = 0
-  const lineNumberDigits = Math.ceil(Math.log10(tokens.length))
+  const lineNumberDigits = Math.max(1, String(tokens.length).length)
   const keyed = splitWhitespaceTokens(tokens)
     .flatMap((line, lineIdx): ThemedToken[] => {
       firstOffset = line[0]?.offset || lastOffset
