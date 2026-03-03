@@ -139,9 +139,3 @@ export class ShikiMagicMove extends HTMLElement {
 }
 
 customElements.define('shiki-magic-move', ShikiMagicMove)
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'shiki-magic-move': ShikiMagicMove
-  }
-}

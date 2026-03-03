@@ -100,9 +100,3 @@ export class ShikiMagicMovePrecompiled extends HTMLElement {
 }
 
 customElements.define('shiki-magic-move-precompiled', ShikiMagicMovePrecompiled)
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'shiki-magic-move-precompiled': ShikiMagicMovePrecompiled
-  }
-}

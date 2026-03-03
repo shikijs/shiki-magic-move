@@ -1,4 +1,4 @@
-import './type-augment'
+import type {} from './type-augment'
 
 export { ShikiMagicMove } from './ShikiMagicMove'
 export { ShikiMagicMovePrecompiled } from './ShikiMagicMovePrecompiled'
