@@ -1,5 +1,6 @@
 ignoreWorkspaceRootCheck: true
 
+minimumReleaseAge: 0
 shellEmulator: true
 trustPolicy: no-downgrade
 
@@ -9,6 +10,13 @@ packages:
   - packages/*
   - examples/*
 
+allowBuilds:
+  esbuild: true
+  simple-git-hooks: true
+
+overrides:
+  semver: ^7.8.0
+  vite: ^8.0.13
 onlyBuiltDependencies:
   - esbuild
   - simple-git-hooks

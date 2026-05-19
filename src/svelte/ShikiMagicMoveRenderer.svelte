@@ -29,6 +29,7 @@
   $effect(() => {
     if (!container)
       return
+    // eslint-disable-next-line svelte/no-dom-manipulating -- hand off ownership of `container` to MagicMoveRenderer
     container.innerHTML = ''
     isMounted = true
     renderer = new MagicMoveRenderer(container)
