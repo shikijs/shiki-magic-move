@@ -1,1 +1,1 @@
-export * from './svelte/index'
+export * from '@shikijs/magic-move/svelte'

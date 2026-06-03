@@ -1,7 +1,7 @@
-import type { ShikiMagicMove } from '../../../src/web-component/ShikiMagicMove'
+import type { ShikiMagicMove } from '../../../src/web-component'
 import type { RendererFactory, RendererFactoryResult, RendererUpdatePayload } from './types'
 
-import '../../../src/web-component/ShikiMagicMove'
+import '../../../src/web-component'
 
 export const createRendererWebComponent: RendererFactory = (options): RendererFactoryResult => {
   let app: ShikiMagicMove | undefined

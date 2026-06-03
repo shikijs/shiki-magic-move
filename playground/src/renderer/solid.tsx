@@ -1,10 +1,11 @@
 /** @jsxImportSource solid-js */
 
-import type { ShikiMagicMoveProps } from '../../../src/solid/ShikiMagicMove'
 import type { RendererFactory, RendererFactoryResult } from './types'
 import { createSignal } from 'solid-js'
 import { render } from 'solid-js/web'
 import { ShikiMagicMove } from '../../../src/solid'
+
+type ShikiMagicMoveProps = Parameters<typeof ShikiMagicMove>[0]
 
 export const createRendererSolid: RendererFactory = (options): RendererFactoryResult => {
   const [props, setProps] = createSignal({

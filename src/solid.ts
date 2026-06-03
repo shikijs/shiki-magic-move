@@ -1,1 +1,1 @@
-export * from './solid/index'
+export * from '@shikijs/magic-move/solid'

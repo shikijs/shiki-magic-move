@@ -1,1 +1,1 @@
-export * from './vue/index'
+export * from '@shikijs/magic-move/vue'

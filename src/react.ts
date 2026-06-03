@@ -1,1 +1,1 @@
-export * from './react/index'
+export * from '@shikijs/magic-move/react'

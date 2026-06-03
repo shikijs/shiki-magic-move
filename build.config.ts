@@ -1,68 +1,36 @@
-import type { Plugin } from 'rollup'
 import fs from 'node:fs/promises'
-import babel from '@rollup/plugin-babel'
+import path from 'node:path'
 import { defineBuildConfig } from 'unbuild'
 
+// Since 4.2.0, `shiki-magic-move` is a thin redirect to `@shikijs/magic-move`.
+// Every source file is a one-line `export * from '@shikijs/magic-move/<sub>'`,
+// so we use a single `mkdist` builder which transforms files 1:1 (no
+// rollup-bundling, no babel) — keeping the emitted `.mjs` and `.d.ts`
+// declarations as small and isolated as the sources.
 export default defineBuildConfig({
   entries: [
-    'src/index',
-    'src/vue',
-    'src/react',
-    'src/core',
-    'src/types',
-    'src/solid',
-    'src/web-component',
-    'src/renderer',
     {
       builder: 'mkdist',
-      outDir: 'dist',
       input: './src',
-      pattern: ['**/*.css'],
-    },
-    {
-      builder: 'mkdist',
-      input: 'src/svelte',
-      outDir: 'dist/svelte',
-      format: 'esm',
-      pattern: ['**/*'],
+      outDir: 'dist',
     },
   ],
   declaration: true,
   clean: true,
-  rollup: {
-    inlineDependencies: true,
-    // Disable esbuild in favor of Babel for SolidJS support
-    esbuild: false,
-  },
+  externals: ['@shikijs/magic-move'],
   hooks: {
-    'rollup:options': async (config, options) => {
-      options.plugins ||= []
-      const plugins = options.plugins as Plugin[]
-      plugins.unshift(babel({
-        babelHelpers: 'bundled',
-        include: ['src/**'],
-        exclude: ['src/solid/**', 'src/react/**'],
-        presets: ['@babel/preset-typescript'],
-        extensions: ['.ts', '.js'],
-      }))
-      plugins.unshift(babel({
-        babelHelpers: 'bundled',
-        include: ['src/solid/**'],
-        presets: ['@babel/preset-typescript', 'solid'],
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      }))
-      plugins.unshift(babel({
-        babelHelpers: 'bundled',
-        include: ['src/react/**'],
-        presets: ['@babel/preset-typescript', '@babel/preset-react'],
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
-      }))
-    },
+    // `mkdist` only emits `.d.ts`, but the package's `typesVersions` map and
+    // upstream `@shikijs/magic-move` both expose `.d.mts`. Mirror every
+    // `.d.ts` to a `.d.mts` so both module resolution modes resolve types.
     'mkdist:done': async () => {
-      await fs.writeFile('dist/svelte.mjs', 'export * from "./svelte/index.mjs"\n', 'utf-8')
-      await fs.writeFile('dist/svelte.d.ts', 'export * from "./svelte/index.mjs"\n', 'utf-8')
-      await fs.writeFile('dist/svelte.d.mts', 'export * from "./svelte/index.mjs"\n', 'utf-8')
-      await fs.copyFile('dist/svelte/index.d.ts', 'dist/svelte/index.d.mts')
+      const distDir = 'dist'
+      for (const entry of await fs.readdir(distDir)) {
+        if (!entry.endsWith('.d.ts'))
+          continue
+        const src = path.join(distDir, entry)
+        const dst = path.join(distDir, `${entry.slice(0, -'.d.ts'.length)}.d.mts`)
+        await fs.copyFile(src, dst)
+      }
     },
   },
 })
